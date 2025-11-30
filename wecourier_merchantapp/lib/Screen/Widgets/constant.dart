@@ -3,7 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 
 
 
- const kMainColor = Color(0xFF2a765d);
+ const kMainColor = Color(0xFF7e0095);
  const kBgColor = Color(0xFFfafafb);
  const Color itembg = Color(0xffEFF0F6);
  const Color deleveryColor = Color(0xffBDEFFF);
