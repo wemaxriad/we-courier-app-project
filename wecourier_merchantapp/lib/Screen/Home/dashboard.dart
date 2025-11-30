@@ -49,6 +49,9 @@ class DashBoard extends StatefulWidget {
 
 class _DashBoardState extends State<DashBoard> {
   LanguageController languageController = Get.put(LanguageController());
+  DashboardController dashboard = Get.put(DashboardController());
+  GlobalController globalController = Get.put(GlobalController());
+
   final box = GetStorage();
   Language? selectedLang;
   List<String> reportList = [
@@ -77,8 +80,7 @@ class _DashBoardState extends State<DashBoard> {
     Images.banner3,
   ];
 
-  DashboardController dashboard = Get.put(DashboardController());
-  GlobalController globalController = Get.put(GlobalController());
+
   @override
   void initState() {
     FirebaseMessaging.instance.getInitialMessage().then((RemoteMessage? message) {});
@@ -247,7 +249,6 @@ class _DashBoardState extends State<DashBoard> {
       ),
 
       body:  GetBuilder<DashboardController>(
-          init: DashboardController(),
           builder: (dashboard) =>
               SingleChildScrollView(
                   child:dashboard.dashboardLoader

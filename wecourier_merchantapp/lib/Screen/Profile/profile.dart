@@ -36,7 +36,6 @@ class _ProfileState extends State<Profile> {
   @override
   Widget build(BuildContext context) {
     return GetBuilder<ProfileController>(
-        init: ProfileController(),
         builder: (profile) =>
             Scaffold(
           backgroundColor: kMainColor,
