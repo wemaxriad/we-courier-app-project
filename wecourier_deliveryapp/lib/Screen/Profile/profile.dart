@@ -49,7 +49,6 @@ class _ProfileState extends State<Profile> {
 
       ),
       body: GetBuilder<ProfileController>(
-    init: ProfileController(),
     builder: (profile) => SingleChildScrollView(
       child: Container(child:
       Column(

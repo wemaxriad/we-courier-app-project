@@ -138,7 +138,6 @@ class _DashBoardState extends State<DashBoard> {
   Widget build(BuildContext context) {
     selectedLang = languageController.languageList[languageController.languageList.indexWhere((i) => i.locale == Get.locale)];
     return GetBuilder<DashboardController>(
-        init: DashboardController(),
         builder: (dashboard) => DefaultTabController(
             length: 3,
             child: Scaffold(
@@ -316,7 +315,7 @@ class _DashBoardState extends State<DashBoard> {
                   horizontalTitleGap: 0,
                   contentPadding: const EdgeInsets.all(5.0),
                   title: Text(
-                    'Shohoz Courier'.tr,
+                      '${Get.find<GlobalController>().siteName }',
                     style: kTextStyle.copyWith(color: kBgColor, fontSize: 16.0, fontWeight: FontWeight.bold),
                   ),
                   trailing: Container(
