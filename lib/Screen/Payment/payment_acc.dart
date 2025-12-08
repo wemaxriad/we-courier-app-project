@@ -119,73 +119,152 @@ class _PaymentAccState extends State<PaymentAcc> {
                                 ),
                               ),
                               const SizedBox(height: 20.0),
-                              Row(
-                                children: [
-                                  Text(
-                                    'bank_name'.tr+':*',
-                                    style: kTextStyle.copyWith(
-                                        color: kTitleColor,
-                                        fontWeight: FontWeight.bold),
-                                  ),
-                                  const Spacer(),
-                                  Text(
-                                    account.accountList[index].bankName ?? '',
-                                    style:
-                                    kTextStyle.copyWith(color: kGreyTextColor),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(height: 5.0),
-                              Row(
-                                children: [
-                                  Text(
-                                    'holder_name'.tr+'*:',
-                                    style: kTextStyle.copyWith(
-                                        color: kTitleColor,
-                                        fontWeight: FontWeight.bold),
-                                  ),
-                                  const Spacer(),
-                                  Text(
-                                    account.accountList[index].holderName ?? '',
-                                    style:
-                                    kTextStyle.copyWith(color: kGreyTextColor),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(height: 5.0),
-                              Row(
-                                children: [
-                                  Text(
-                                    'account_no'.tr+':*',
-                                    style: kTextStyle.copyWith(
-                                        color: kTitleColor,
-                                        fontWeight: FontWeight.bold),
-                                  ),
-                                  const Spacer(),
-                                  Text(
-                                    account.accountList[index].accountNo ?? '',
-                                    style:
-                                    kTextStyle.copyWith(color: kGreyTextColor),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(height: 5.0),
-                              Row(
-                                children: [
-                                  Text(
-                                    'branch_name'.tr+':*',
-                                    style: kTextStyle.copyWith(
-                                        color: kTitleColor,
-                                        fontWeight: FontWeight.bold),
-                                  ),
-                                  const Spacer(),
-                                  Text(
-                                    account.accountList[index].branchName ?? '',
-                                    style:
-                                    kTextStyle.copyWith(color: kGreyTextColor),
-                                  ),
-                                ],
-                              ),
+                              if(account.accountList[index].paymentMethod =='bank')
+                                Column(
+                                  children: [
+                                    Row(
+                                      children: [
+                                        Text(
+                                          'bank_name'.tr+':*',
+                                          style: kTextStyle.copyWith(
+                                              color: kTitleColor,
+                                              fontWeight: FontWeight.bold),
+                                        ),
+                                        const Spacer(),
+                                        Text(
+                                          account.accountList[index].bankName ?? '',
+                                          style:
+                                          kTextStyle.copyWith(color: kGreyTextColor),
+                                        ),
+                                      ],
+                                    ),
+                                    const SizedBox(height: 5.0),
+                                    Row(
+                                      children: [
+                                        Text(
+                                          'holder_name'.tr+'*:',
+                                          style: kTextStyle.copyWith(
+                                              color: kTitleColor,
+                                              fontWeight: FontWeight.bold),
+                                        ),
+                                        const Spacer(),
+                                        Text(
+                                          account.accountList[index].holderName ?? '',
+                                          style:
+                                          kTextStyle.copyWith(color: kGreyTextColor),
+                                        ),
+                                      ],
+                                    ),
+                                    const SizedBox(height: 5.0),
+                                    Row(
+                                      children: [
+                                        Text(
+                                          'account_no'.tr+':*',
+                                          style: kTextStyle.copyWith(
+                                              color: kTitleColor,
+                                              fontWeight: FontWeight.bold),
+                                        ),
+                                        const Spacer(),
+                                        Text(
+                                          account.accountList[index].accountNo ?? '',
+                                          style:
+                                          kTextStyle.copyWith(color: kGreyTextColor),
+                                        ),
+                                      ],
+                                    ),
+                                    const SizedBox(height: 5.0),
+                                    Row(
+                                      children: [
+                                        Text(
+                                          'branch_name'.tr+':*',
+                                          style: kTextStyle.copyWith(
+                                              color: kTitleColor,
+                                              fontWeight: FontWeight.bold),
+                                        ),
+                                        const Spacer(),
+                                        Text(
+                                          account.accountList[index].branchName ?? '',
+                                          style:
+                                          kTextStyle.copyWith(color: kGreyTextColor),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              if(account.accountList[index].paymentMethod =='mobile')
+                                Column(
+                                  children: [
+                                    Row(
+                                      children: [
+                                        Text(
+                                          'holder_name'.tr+'*:',
+                                          style: kTextStyle.copyWith(
+                                              color: kTitleColor,
+                                              fontWeight: FontWeight.bold),
+                                        ),
+                                        const Spacer(),
+                                        Text(
+                                          account.accountList[index].holderName ?? '',
+                                          style:
+                                          kTextStyle.copyWith(color: kGreyTextColor),
+                                        ),
+                                      ],
+                                    ),
+                                    const SizedBox(height: 5.0),
+                                    Row(
+                                      children: [
+                                        Text(
+                                          'bank_name'.tr+':*',
+                                          style: kTextStyle.copyWith(
+                                              color: kTitleColor,
+                                              fontWeight: FontWeight.bold),
+                                        ),
+                                        const Spacer(),
+                                        Text(
+                                          account.accountList[index].mobileCompany ?? '',
+                                          style:
+                                          kTextStyle.copyWith(color: kGreyTextColor),
+                                        ),
+                                      ],
+                                    ),
+                                    const SizedBox(height: 5.0),
+                                    Row(
+                                      children: [
+                                        Text(
+                                          'account_no'.tr+':*',
+                                          style: kTextStyle.copyWith(
+                                              color: kTitleColor,
+                                              fontWeight: FontWeight.bold),
+                                        ),
+                                        const Spacer(),
+                                        Text(
+                                          account.accountList[index].mobileNo ?? '',
+                                          style:
+                                          kTextStyle.copyWith(color: kGreyTextColor),
+                                        ),
+                                      ],
+                                    ),
+                                    const SizedBox(height: 5.0),
+                                    Row(
+                                      children: [
+                                        Text(
+                                          'Account Type'.tr+':*',
+                                          style: kTextStyle.copyWith(
+                                              color: kTitleColor,
+                                              fontWeight: FontWeight.bold),
+                                        ),
+                                        const Spacer(),
+                                        Text(
+                                          account.accountList[index].accountType ?? '',
+                                          style:
+                                          kTextStyle.copyWith(color: kGreyTextColor),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                )
+
+
                             ],
                           ),
                         ),
