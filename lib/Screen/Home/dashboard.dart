@@ -56,22 +56,57 @@ class _DashBoardState extends State<DashBoard> {
   late StreamSubscription<Position> positionStream;
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
+
     checkGps();
-    // FirebaseMessaging.instance.getInitialMessage().then((RemoteMessage? message) {});
-    //
-    // FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-    //   Get.rawSnackbar(
-    //     snackPosition: SnackPosition.TOP,
-    //     title: message.notification?.title,
-    //     message: message.notification?.body,
-    //     backgroundColor: kMainColor.withOpacity(.9),
-    //     maxWidth: ScreenSize(context).mainWidth / 1.007,
-    //     margin: const EdgeInsets.only(bottom: 20, left: 20, right: 20),
-    //   );
-    // });
+
+    /// 🔥 When app is opened from killed state (tap on notification)
+    FirebaseMessaging.instance.getInitialMessage().then((message) {
+      if (message != null) {
+        _handleNotificationNavigation(message);
+      }
+    });
+
+    /// 🔥 When app is opened from background state
+    FirebaseMessaging.onMessageOpenedApp.listen((message) {
+      _handleNotificationNavigation(message);
+    });
+
+    /// 🔥 Foreground message → show snackbar
+    FirebaseMessaging.onMessage.listen((message) {
+      Get.rawSnackbar(
+        snackPosition: SnackPosition.TOP,
+        title: message.notification?.title,
+        message: message.notification?.body,
+        backgroundColor: kMainColor.withOpacity(.9),
+        maxWidth: ScreenSize(context).mainWidth / 1.007,
+        margin: const EdgeInsets.only(bottom: 20, left: 20, right: 20),
+      );
+    });
   }
+
+  void _handleNotificationNavigation(RemoteMessage message) {
+    print("Notification clicked: ${message.data}");
+
+    final data = message.data;
+
+    if (data.containsKey('screen')) {
+      switch (data['screen']) {
+
+        case "parcelDetails":
+          Get.toNamed('/parcelDetails', arguments: data['id']);
+          break;
+
+        case "chat":
+          Get.toNamed('/chatPage', arguments: data['chatId']);
+          break;
+
+        default:
+          print("Unknown screen from notification");
+      }
+    }
+  }
+
 
   checkGps() async {
     servicestatus = await Geolocator.isLocationServiceEnabled();

@@ -17,7 +17,10 @@ import 'package:flutter/foundation.dart'
 class DefaultFirebaseOptions {
   static FirebaseOptions get currentPlatform {
     if (kIsWeb) {
-      return web;
+      throw UnsupportedError(
+        'DefaultFirebaseOptions have not been configured for web - '
+            'you can reconfigure this by running the FlutterFire CLI again.',
+      );
     }
     switch (defaultTargetPlatform) {
       case TargetPlatform.android:
@@ -27,17 +30,17 @@ class DefaultFirebaseOptions {
       case TargetPlatform.macOS:
         throw UnsupportedError(
           'DefaultFirebaseOptions have not been configured for macos - '
-          'you can reconfigure this by running the FlutterFire CLI again.',
+              'you can reconfigure this by running the FlutterFire CLI again.',
         );
       case TargetPlatform.windows:
         throw UnsupportedError(
           'DefaultFirebaseOptions have not been configured for windows - '
-          'you can reconfigure this by running the FlutterFire CLI again.',
+              'you can reconfigure this by running the FlutterFire CLI again.',
         );
       case TargetPlatform.linux:
         throw UnsupportedError(
           'DefaultFirebaseOptions have not been configured for linux - '
-          'you can reconfigure this by running the FlutterFire CLI again.',
+              'you can reconfigure this by running the FlutterFire CLI again.',
         );
       default:
         throw UnsupportedError(
@@ -46,27 +49,20 @@ class DefaultFirebaseOptions {
     }
   }
 
-  static const FirebaseOptions web = FirebaseOptions(
-    appId: '1:151878495365:android:2510842ed9330bba260dec',
-    apiKey: 'AIzaSyDCthiio0WgX1F2CiVlw1Z-kWOKYYi6vQI',
-    projectId: 'we-courier-81101',
-    messagingSenderId: '151878495365',
-    authDomain: 'we-courier-81101.firebaseapp.com',
-  );
-
   static const FirebaseOptions android = FirebaseOptions(
-    appId: '1:151878495365:android:2510842ed9330bba260dec',
-    apiKey: 'AIzaSyDCthiio0WgX1F2CiVlw1Z-kWOKYYi6vQI',
-    projectId: 'we-courier-81101',
-    messagingSenderId: '151878495365',
-    authDomain: 'we-courier-81101.firebaseapp.com',
+    apiKey: 'AIzaSyDDVK5sgyt_RBeLmRdzJW-Dyr-g7jp_zjA',
+    appId: '1:870476070400:android:346eddf634033942d762e5',
+    messagingSenderId: '870476070400',
+    projectId: 'wecourier-f72f2',
+    storageBucket: 'wecourier-f72f2.firebasestorage.app',
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
-    appId: '1:151878495365:android:2510842ed9330bba260dec',
-    apiKey: 'AIzaSyDCthiio0WgX1F2CiVlw1Z-kWOKYYi6vQI',
-    projectId: 'we-courier-81101',
-    messagingSenderId: '151878495365',
-    authDomain: 'we-courier-81101.firebaseapp.com',
+    apiKey: 'AIzaSyCfzlqFzPVl5-HqSR0uVUqXNVi0CYFckn8',
+    appId: '1:870476070400:ios:2ec1bf410f52fccdd762e5',
+    messagingSenderId: '870476070400',
+    projectId: 'wecourier-f72f2',
+    storageBucket: 'wecourier-f72f2.firebasestorage.app',
+    iosBundleId: 'com.example.untitled',
   );
 }
