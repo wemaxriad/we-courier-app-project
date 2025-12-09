@@ -25,19 +25,13 @@ class DefaultFirebaseOptions {
       case TargetPlatform.iOS:
         return ios;
       case TargetPlatform.macOS:
-        throw UnsupportedError(
-          'DefaultFirebaseOptions have not been configured for macos - '
-          'you can reconfigure this by running the FlutterFire CLI again.',
-        );
+        return macos;
       case TargetPlatform.windows:
-        throw UnsupportedError(
-          'DefaultFirebaseOptions have not been configured for windows - '
-          'you can reconfigure this by running the FlutterFire CLI again.',
-        );
+        return windows;
       case TargetPlatform.linux:
         throw UnsupportedError(
           'DefaultFirebaseOptions have not been configured for linux - '
-          'you can reconfigure this by running the FlutterFire CLI again.',
+              'you can reconfigure this by running the FlutterFire CLI again.',
         );
       default:
         throw UnsupportedError(
@@ -47,26 +41,48 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions web = FirebaseOptions(
-    appId: '1:151878495365:android:2510842ed9330bba260dec',
-    apiKey: 'AIzaSyDCthiio0WgX1F2CiVlw1Z-kWOKYYi6vQI',
-    projectId: 'we-courier-81101',
-    messagingSenderId: '151878495365',
-    authDomain: 'we-courier-81101.firebaseapp.com',
+    apiKey: 'AIzaSyCy9lre9lbwlCxRgAYob_u_8VEHjMRK8zw',
+    appId: '1:870476070400:web:111188c606238ed9d762e5',
+    messagingSenderId: '870476070400',
+    projectId: 'wecourier-f72f2',
+    authDomain: 'wecourier-f72f2.firebaseapp.com',
+    storageBucket: 'wecourier-f72f2.firebasestorage.app',
+    measurementId: 'G-JESVYWXSSS',
   );
 
   static const FirebaseOptions android = FirebaseOptions(
-    appId: '1:151878495365:android:2510842ed9330bba260dec',
-    apiKey: 'AIzaSyDCthiio0WgX1F2CiVlw1Z-kWOKYYi6vQI',
-    projectId: 'we-courier-81101',
-    messagingSenderId: '151878495365',
-    authDomain: 'we-courier-81101.firebaseapp.com',
+    apiKey: 'AIzaSyDDVK5sgyt_RBeLmRdzJW-Dyr-g7jp_zjA',
+    appId: '1:870476070400:android:55764e0d6ba8e67ad762e5',
+    messagingSenderId: '870476070400',
+    projectId: 'wecourier-f72f2',
+    storageBucket: 'wecourier-f72f2.firebasestorage.app',
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
-    appId: '1:151878495365:android:2510842ed9330bba260dec',
-    apiKey: 'AIzaSyDCthiio0WgX1F2CiVlw1Z-kWOKYYi6vQI',
-    projectId: 'we-courier-81101',
-    messagingSenderId: '151878495365',
-    authDomain: 'we-courier-81101.firebaseapp.com',
+    apiKey: 'AIzaSyCfzlqFzPVl5-HqSR0uVUqXNVi0CYFckn8',
+    appId: '1:870476070400:ios:eb232965e853c238d762e5',
+    messagingSenderId: '870476070400',
+    projectId: 'wecourier-f72f2',
+    storageBucket: 'wecourier-f72f2.firebasestorage.app',
+    iosBundleId: 'com.wecourier.driver',
+  );
+
+  static const FirebaseOptions macos = FirebaseOptions(
+    apiKey: 'AIzaSyCfzlqFzPVl5-HqSR0uVUqXNVi0CYFckn8',
+    appId: '1:870476070400:ios:eb232965e853c238d762e5',
+    messagingSenderId: '870476070400',
+    projectId: 'wecourier-f72f2',
+    storageBucket: 'wecourier-f72f2.firebasestorage.app',
+    iosBundleId: 'com.wecourier.driver',
+  );
+
+  static const FirebaseOptions windows = FirebaseOptions(
+    apiKey: 'AIzaSyCy9lre9lbwlCxRgAYob_u_8VEHjMRK8zw',
+    appId: '1:870476070400:web:7e08686498933eecd762e5',
+    messagingSenderId: '870476070400',
+    projectId: 'wecourier-f72f2',
+    authDomain: 'wecourier-f72f2.firebaseapp.com',
+    storageBucket: 'wecourier-f72f2.firebasestorage.app',
+    measurementId: 'G-7GL12JRBEC',
   );
 }

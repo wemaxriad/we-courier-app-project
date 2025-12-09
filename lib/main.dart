@@ -9,27 +9,32 @@ import 'package:get_storage/get_storage.dart';
 import 'Controllers/global-controller.dart';
 import 'Locale/language.dart';
 import 'Screen/SplashScreen/splash_screen.dart';
+import 'firebase_options.dart';
+import 'services/notification_service.dart';
 
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  // const firebaseOptions = FirebaseOptions(
-  //   appId: '1:151878495365:android:2510842ed9330bba260dec',
-  //   apiKey: 'AIzaSyDCthiio0WgX1F2CiVlw1Z-kWOKYYi6vQI',
-  //   projectId: 'we-courier-81101',
-  //   messagingSenderId: '151878495365',
-  //   authDomain: 'we-courier-81101.firebaseapp.com',
-  // );
-  // await Firebase.initializeApp(name: 'courier', options: firebaseOptions);
-  final box = GetStorage();
+
   await GetStorage.init();
+
+  // ✅ Firebase must be initialized FIRST and ONLY ONCE
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+
+  final box = GetStorage();
+
   dynamic langValue = const Locale('en', 'US');
   if (box.read('lang') != null) {
     langValue = Locale(box.read('lang'), box.read('langKey'));
-  } else {
-    langValue = const Locale('en', 'US');
   }
-  runApp( MyApp(lang: langValue));
+
+  // ✅ Now notification service can safely run
+  NotificationService notificationService = NotificationService();
+  await notificationService.initialize();
+
+  runApp(MyApp(lang: langValue));
 }
 
 class MyApp extends StatelessWidget {

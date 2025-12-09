@@ -7,7 +7,6 @@ import 'package:geolocator/geolocator.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:syncfusion_flutter_signaturepad/signaturepad.dart';
-import 'package:wecourier_driver_app/Screen/Home/parcelMapShow.dart';
 //import 'package:wecourier_deliveryapp/Screen/Home/parcelMapShow.dart';
 import '/Controllers/dashboard_controller.dart';
 import '/Screen/Home/home.dart';
@@ -33,6 +32,7 @@ import '../../utils/image.dart';
 import '../Widgets/constant.dart';
 import '../Widgets/custom_form_field.dart';
 import '../Widgets/form_title.dart';
+import 'parcelMapShow.dart';
 
 class DashBoard extends StatefulWidget {
   const DashBoard({Key? key}) : super(key: key);
@@ -59,18 +59,18 @@ class _DashBoardState extends State<DashBoard> {
     // TODO: implement initState
     super.initState();
     checkGps();
-    // FirebaseMessaging.instance.getInitialMessage().then((RemoteMessage? message) {});
-    //
-    // FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-    //   Get.rawSnackbar(
-    //     snackPosition: SnackPosition.TOP,
-    //     title: message.notification?.title,
-    //     message: message.notification?.body,
-    //     backgroundColor: kMainColor.withOpacity(.9),
-    //     maxWidth: ScreenSize(context).mainWidth / 1.007,
-    //     margin: const EdgeInsets.only(bottom: 20, left: 20, right: 20),
-    //   );
-    // });
+    FirebaseMessaging.instance.getInitialMessage().then((RemoteMessage? message) {});
+
+    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+      Get.rawSnackbar(
+        snackPosition: SnackPosition.TOP,
+        title: message.notification?.title,
+        message: message.notification?.body,
+        backgroundColor: green.withOpacity(.9),
+        maxWidth: ScreenSize(context).mainWidth / 1.007,
+        margin: const EdgeInsets.only(bottom: 20, left: 20, right: 20),
+      );
+    });
   }
 
   checkGps() async {
