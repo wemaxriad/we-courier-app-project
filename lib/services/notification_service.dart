@@ -5,19 +5,15 @@ import 'package:get/get.dart';
 import '../../firebase_options.dart';
 
 class NotificationService {
-  FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+  final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
   FlutterLocalNotificationsPlugin();
 
   Future<void> initialize() async {
-
-    await Firebase.initializeApp(
-      name: 'courier delivery',
-      options: DefaultFirebaseOptions.currentPlatform,
-    );
-
     await FirebaseMessaging.instance.setAutoInitEnabled(true);
+
     RemoteMessage? initialMessage =
     await FirebaseMessaging.instance.getInitialMessage();
+
     await FirebaseMessaging.instance
         .setForegroundNotificationPresentationOptions(
       alert: true,
@@ -27,59 +23,52 @@ class NotificationService {
 
     await FirebaseMessaging.instance.requestPermission(
       alert: true,
-      announcement: false,
       badge: true,
-      carPlay: false,
-      criticalAlert: false,
-      provisional: false,
       sound: true,
     );
+
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-      // Handle incoming message when the app is in the foreground
-      print('Received a foreground message: ${message.notification?.title}');
-      // Add your custom logic here to display the notification or handle the data
-      // You can use the `flutter_local_notifications` plugin to display the message
-      // or just use an AlertDialog or something...
-      if(message.notification != null) {
+      if (message.notification != null) {
         _showNotification(message.notification!);
       }
     });
 
-
     const AndroidInitializationSettings androidInitializationSettings =
-    AndroidInitializationSettings('@mipmap/launcher_icon');
+    AndroidInitializationSettings('@mipmap/ic_launcher');
+
     final DarwinInitializationSettings iosInitializationSettings =
     DarwinInitializationSettings(
-        requestAlertPermission: true,
-        requestBadgePermission: true,
-        requestSoundPermission: true,
-        // onDidReceiveLocalNotification: (int id, String? title, String? body, String? payload) async {}
+      requestAlertPermission: true,
+      requestBadgePermission: true,
+      requestSoundPermission: true,
     );
+
     final InitializationSettings initializationSettings =
     InitializationSettings(
-        android: androidInitializationSettings,
-        iOS: iosInitializationSettings);
+      android: androidInitializationSettings,
+      iOS: iosInitializationSettings,
+    );
 
     await flutterLocalNotificationsPlugin.initialize(initializationSettings);
   }
 
   Future<void> _showNotification(RemoteNotification notification) async {
     const AndroidNotificationDetails androidPlatformChannelSpecifics =
-    AndroidNotificationDetails('0', 'we delivery courier',
-      channelDescription: '',
+    AndroidNotificationDetails(
+      '0',
+      'WeCourier merchant',
       importance: Importance.max,
       priority: Priority.high,
-      styleInformation: BigTextStyleInformation(''),
     );
+
     const NotificationDetails platformChannelSpecifics =
     NotificationDetails(android: androidPlatformChannelSpecifics);
+
     await flutterLocalNotificationsPlugin.show(
-      0, // notification id
-      notification.title, // title
-      notification.body, // body
+      0,
+      notification.title,
+      notification.body,
       platformChannelSpecifics,
-      payload: 'we delivery notification',
     );
   }
-
 }

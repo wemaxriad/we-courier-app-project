@@ -63,7 +63,7 @@ class PaymentAccountListData {
 
 class Accounts {
   int? id;
-  String? merchantId;
+  dynamic merchantId;
   String? paymentMethod;
   String? paymentMethodName;
   dynamic bankId;

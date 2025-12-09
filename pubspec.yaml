@@ -1,4 +1,4 @@
-name: wecourier_marchant_app
+name: project
 description: "A new Flutter project."
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
@@ -19,7 +19,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 version: 1.0.0+1
 
 environment:
-  sdk: ^3.10.1
+  sdk: ^3.10.3
 
 # Dependencies specify other packages that your package needs in order to work.
 # To automatically upgrade your package dependencies to the latest versions
@@ -53,15 +53,11 @@ dependencies:
   flutter_screenutil: ^5.6.0
   get_storage: ^2.0.3
   flutter_svg: ^2.0.7
-  firebase_core: ^3.1.1
-  firebase_messaging: ^15.0.2
-  firebase_analytics: ^11.1.0
-  firebase_core_dart: ^1.0.1
-  firebase_core_platform_interface: ^5.1.0
+  firebase_core: ^4.2.1
+  firebase_messaging: ^16.0.4
   google_maps_flutter: ^2.5.0
-  #  address_search_field: ^5.0.3
   rainbow_color: ^2.0.1
-  flutter_local_notifications: ^18.0.0
+  flutter_local_notifications: ^19.5.0
 
 dev_dependencies:
   flutter_test:
@@ -108,7 +104,6 @@ flutter:
   # in this "flutter" section. Each entry in this list should have a
   # "family" key with the font family name, and a "fonts" key with a
   # list giving the asset and other descriptors for the font. For
-  # example:
   fonts:
     - family: Rubik
       fonts:

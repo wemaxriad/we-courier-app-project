@@ -4,30 +4,39 @@ import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
-import 'package:wecourier_marchant_app/services/notification_service.dart';
+import 'package:project/services/notification_service.dart';
 
 import 'Controllers/global-controller.dart';
 import 'Locale/language.dart';
 import 'Screen/SplashScreen/splash_screen.dart';
 import 'Screen/Widgets/constant.dart';
+import 'firebase_options.dart';
 
 
 Future<void> main() async {
-  final box = GetStorage();
   WidgetsFlutterBinding.ensureInitialized();
-  // NotificationService notificationService = NotificationService();
-  // await notificationService.initialize();
 
   await GetStorage.init();
+
+  // ✅ Firebase must be initialized FIRST and ONLY ONCE
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+
+  final box = GetStorage();
+
   dynamic langValue = const Locale('en', 'US');
   if (box.read('lang') != null) {
     langValue = Locale(box.read('lang'), box.read('langKey'));
-  } else {
-    langValue = const Locale('en', 'US');
   }
 
-  runApp( MyApp(lang: langValue,));
+  // ✅ Now notification service can safely run
+  NotificationService notificationService = NotificationService();
+  await notificationService.initialize();
+
+  runApp(MyApp(lang: langValue));
 }
+
 
 class MyApp extends StatelessWidget {
   final Locale lang;
@@ -58,4 +67,3 @@ class MyApp extends StatelessWidget {
             )));
   }
 }
-

@@ -7,6 +7,25 @@
   "client": [
     {
       "client_info": {
+        "mobilesdk_app_id": "1:870476070400:android:346eddf634033942d762e5",
+        "android_client_info": {
+          "package_name": "com.wecourier.driver"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDDVK5sgyt_RBeLmRdzJW-Dyr-g7jp_zjA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
         "mobilesdk_app_id": "1:870476070400:android:9df964a55c07ba2cd762e5",
         "android_client_info": {
           "package_name": "com.wecourier.merchant"

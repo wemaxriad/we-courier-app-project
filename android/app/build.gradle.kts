@@ -1,17 +1,17 @@
 plugins {
     id("com.android.application")
+    // START: FlutterFire Configuration
+    id("com.google.gms.google-services")
+    // END: FlutterFire Configuration
     id("kotlin-android")
     // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
     id("dev.flutter.flutter-gradle-plugin")
-    id("com.google.gms.google-services")
-    id("com.google.firebase.crashlytics")
 }
 
 android {
     namespace = "com.wecourier.merchant"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
-
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
@@ -33,14 +33,7 @@ android {
         versionCode = flutter.versionCode
         versionName = flutter.versionName
     }
-//    signingConfigs {
-//        create("release") {
-//            keyAlias = keystoreProperties["keyAlias"] as String?
-//            keyPassword = keystoreProperties["keyPassword"] as String?
-//            storeFile = keystoreProperties["storeFile"]?.let { file(it as String) }
-//            storePassword = keystoreProperties["storePassword"] as String?
-//        }
-//    }
+
     buildTypes {
         release {
             // TODO: Add your own signing config for the release build.
@@ -55,9 +48,7 @@ flutter {
 }
 
 dependencies {
-    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.4")
+
+    // ✅ Required for Java 17 desugaring
+    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.4")
 }
-
-
-
-
