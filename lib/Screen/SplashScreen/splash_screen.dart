@@ -25,30 +25,30 @@ class _SplashScreenState extends State<SplashScreen> {
     super.initState();
 
     /// On kill state → app opened from notification
-    FirebaseMessaging.instance.getInitialMessage().then((message) {
-      if (message != null) {
-        _handleNotificationNavigation(message);
-      }
-    });
-
-    /// App in foreground
-    FirebaseMessaging.onMessage.listen((message) {
-      print("🔥 FCM onMessage: ${message.notification?.title}");
-      // You already show via local notification → do nothing here
-    });
-
-    /// App reopened from background
-    FirebaseMessaging.onMessageOpenedApp.listen((message) {
-      print("📲 App opened from notification (background)");
-      _handleNotificationNavigation(message);
-    });
-
-    /// Get FCM token
-    FirebaseMessaging.instance.getToken().then((token) {
-      if (token != null) {
-        saveToken(token);
-      }
-    });
+    // FirebaseMessaging.instance.getInitialMessage().then((message) {
+    //   if (message != null) {
+    //     _handleNotificationNavigation(message);
+    //   }
+    // });
+    //
+    // /// App in foreground
+    // FirebaseMessaging.onMessage.listen((message) {
+    //   print("🔥 FCM onMessage: ${message.notification?.title}");
+    //   // You already show via local notification → do nothing here
+    // });
+    //
+    // /// App reopened from background
+    // FirebaseMessaging.onMessageOpenedApp.listen((message) {
+    //   print("📲 App opened from notification (background)");
+    //   _handleNotificationNavigation(message);
+    // });
+    //
+    // /// Get FCM token
+    // FirebaseMessaging.instance.getToken().then((token) {
+    //   if (token != null) {
+    //     saveToken(token);
+    //   }
+    // });
 
     /// Continue splash logic
     Timer(

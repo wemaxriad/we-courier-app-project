@@ -17,36 +17,36 @@ import 'services/notification_service.dart';
 FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
 FlutterLocalNotificationsPlugin();
 
-Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
-  try {
-    await Firebase.initializeApp(
-      name: 'wecourier_bg',
-      options: DefaultFirebaseOptions.currentPlatform,
-    );
-  } catch (e) {
-    // Ignore "already initialized" error
-  }
-
-  print("Background Message: ${message.notification?.title}");
-}
+// Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+//   try {
+//     await Firebase.initializeApp(
+//       name: 'wecourier_bg',
+//       options: DefaultFirebaseOptions.currentPlatform,
+//     );
+//   } catch (e) {
+//     // Ignore "already initialized" error
+//   }
+//
+//   print("Background Message: ${message.notification?.title}");
+// }
 
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
+  // await Firebase.initializeApp(
+  //   options: DefaultFirebaseOptions.currentPlatform,
+  // );
 
-  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
-
-  // Ensure permissions requested
-  await FirebaseMessaging.instance.requestPermission();
+  // FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+  //
+  // // Ensure permissions requested
+  // await FirebaseMessaging.instance.requestPermission();
 
   // Local notification setup
-  await NotificationService().setupNotificationChannel();
-  await NotificationService().initLocalNotification();
-  NotificationService().listenFCMMessages();
+  // await NotificationService().setupNotificationChannel();
+  // await NotificationService().initLocalNotification();
+  // NotificationService().listenFCMMessages();
 
   await GetStorage.init();
   final box = GetStorage();

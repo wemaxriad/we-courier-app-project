@@ -60,29 +60,29 @@ class _DashBoardState extends State<DashBoard> {
 
     checkGps();
 
-    /// 🔥 When app is opened from killed state (tap on notification)
-    FirebaseMessaging.instance.getInitialMessage().then((message) {
-      if (message != null) {
-        _handleNotificationNavigation(message);
-      }
-    });
-
-    /// 🔥 When app is opened from background state
-    FirebaseMessaging.onMessageOpenedApp.listen((message) {
-      _handleNotificationNavigation(message);
-    });
-
-    /// 🔥 Foreground message → show snackbar
-    FirebaseMessaging.onMessage.listen((message) {
-      Get.rawSnackbar(
-        snackPosition: SnackPosition.TOP,
-        title: message.notification?.title,
-        message: message.notification?.body,
-        backgroundColor: kMainColor.withOpacity(.9),
-        maxWidth: ScreenSize(context).mainWidth / 1.007,
-        margin: const EdgeInsets.only(bottom: 20, left: 20, right: 20),
-      );
-    });
+    // /// 🔥 When app is opened from killed state (tap on notification)
+    // FirebaseMessaging.instance.getInitialMessage().then((message) {
+    //   if (message != null) {
+    //     _handleNotificationNavigation(message);
+    //   }
+    // });
+    //
+    // /// 🔥 When app is opened from background state
+    // FirebaseMessaging.onMessageOpenedApp.listen((message) {
+    //   _handleNotificationNavigation(message);
+    // });
+    //
+    // /// 🔥 Foreground message → show snackbar
+    // FirebaseMessaging.onMessage.listen((message) {
+    //   Get.rawSnackbar(
+    //     snackPosition: SnackPosition.TOP,
+    //     title: message.notification?.title,
+    //     message: message.notification?.body,
+    //     backgroundColor: kMainColor.withOpacity(.9),
+    //     maxWidth: ScreenSize(context).mainWidth / 1.007,
+    //     margin: const EdgeInsets.only(bottom: 20, left: 20, right: 20),
+    //   );
+    // });
   }
 
   void _handleNotificationNavigation(RemoteMessage message) {
@@ -175,7 +175,7 @@ class _DashBoardState extends State<DashBoard> {
     selectedLang = languageController.languageList[languageController.languageList.indexWhere((i) => i.locale == Get.locale)];
     return GetBuilder<DashboardController>(
         builder: (dashboard) => DefaultTabController(
-            length: 3,
+            length: 4,
             child: Scaffold(
               // backgroundColor: kMainColor,
               drawer: Drawer(
@@ -346,30 +346,35 @@ class _DashBoardState extends State<DashBoard> {
                 iconTheme: const IconThemeData(color: kBgColor),
                 titleSpacing: 0,
                 backgroundColor: kMainColor,
+                centerTitle: false,
                 elevation: 0.0,
-                title: ListTile(
-                  horizontalTitleGap: 0,
-                  contentPadding: const EdgeInsets.all(5.0),
-                  title: Text(
-                      '${Get.find<GlobalController>().siteName }',
-                    style: kTextStyle.copyWith(color: kBgColor, fontSize: 16.0, fontWeight: FontWeight.bold),
-                  ),
-                  trailing: Container(
-                    padding: EdgeInsets.only(left: 8, right: 0),
-                    decoration: BoxDecoration(
-                      color: Colors.white, //<-- SEE HERE
+                title: Row(
+                  mainAxisAlignment: MainAxisAlignment.start, // ছবিটা বাম দিকে রাখবে
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(left: 8.0), // Optional: একটু বাম প্যাডিং দিতে পারো
+                      child: Image.asset(
+                        'assets/images/logo.png',
+                        width: 120,
+                        height: 60,
+                        fit: BoxFit.contain,
+                      ),
                     ),
-                    height: 25.0,
+                  ],
+                ),
+                actions: [
+                  Container(
+                    padding: const EdgeInsets.only(left: 8, right: 8),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                    ),
+                    height: 30,
                     child: DropdownButton<Language>(
                       iconSize: 18,
                       elevation: 16,
                       value: selectedLang,
-                      style: const TextStyle(color: Colors.white),
-                      underline: Container(
-                        padding: const EdgeInsets.only(left: 4, right: 4),
-                        color: Colors.transparent,
-                      ),
-                      onChanged: (newValue) async {
+                      underline: const SizedBox.shrink(),
+                      onChanged: (newValue) {
                         setState(() {
                           selectedLang = newValue!;
                           if (newValue.langName == 'English') {
@@ -385,7 +390,8 @@ class _DashBoardState extends State<DashBoard> {
                           }
                         });
                       },
-                      items: languageController.languageList.map<DropdownMenuItem<Language>>((Language value) {
+                      items: languageController.languageList
+                          .map<DropdownMenuItem<Language>>((Language value) {
                         return DropdownMenuItem<Language>(
                           value: value,
                           child: Text(
@@ -400,12 +406,12 @@ class _DashBoardState extends State<DashBoard> {
                       }).toList(),
                     ),
                   ),
-                ),
+                ],
                 bottom: TabBar(
                   padding: EdgeInsets.zero,
                   indicatorPadding: EdgeInsets.zero,
                   labelPadding: EdgeInsets.zero,
-                  isScrollable: false,   // IMPORTANT → makes all tabs equal width
+                  isScrollable: false,
                   labelColor: Colors.black,
                   unselectedLabelColor: kBgColor,
                   indicatorSize: TabBarIndicatorSize.tab,
@@ -414,6 +420,17 @@ class _DashBoardState extends State<DashBoard> {
                     borderRadius: BorderRadius.circular(0),
                   ),
                   tabs: [
+                    Tab(
+                      child: Container(
+                        padding: EdgeInsets.symmetric(vertical: 5),
+                        child: Center(
+                          child: Text(
+                            'pickup_assign'.tr,
+                            style: TextStyle(fontWeight: FontWeight.w500, fontSize: 16),
+                          ),
+                        ),
+                      ),
+                    ),
                     Tab(
                       child: Container(
                         padding: EdgeInsets.symmetric(vertical: 10),
@@ -448,47 +465,294 @@ class _DashBoardState extends State<DashBoard> {
                       ),
                     ),
                   ],
-                )
-
+                ),
               ),
-              floatingActionButton: dashboard.deliverymanAssignList.length == 0
-                  ? Container()
-                  : Align(
-                      alignment: Alignment.bottomCenter,
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          ElevatedButton(
-                              onPressed: () {
-                                Get.to(ParcelMapShow(lat, long));
-                              },
-                              child: const Text('See Route')),
-                          SizedBox(
-                            width: 20,
-                          ),
-                          Container(
-                              width: 170,
-                              height: 36,
-                              margin: const EdgeInsets.all(0.0),
-                              padding: const EdgeInsets.only(left: 4),
-                              decoration: BoxDecoration(border: Border.all(color: Colors.blueAccent)),
-                              child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-                                const Text('Location ON'),
-                                Switch(
-                                  onChanged: toggleSwitch,
-                                  value: isSwitched,
-                                  activeColor: Colors.white,
-                                  activeTrackColor: Colors.red,
-                                  inactiveThumbColor: Colors.red,
-                                  inactiveTrackColor: Colors.black,
-                                ),
-                              ])),
-                        ],
-                      )),
+
+                // floatingActionButton: dashboard.deliverymanAssignList.length == 0
+                //   ? Container()
+                //   : Align(
+                //       alignment: Alignment.bottomCenter,
+                //       child: Row(
+                //         mainAxisAlignment: MainAxisAlignment.center,
+                //         children: [
+                //           ElevatedButton(
+                //               onPressed: () {
+                //                 Get.to(ParcelMapShow(lat, long));
+                //               },
+                //               child: const Text('See Route')),
+                //           SizedBox(
+                //             width: 20,
+                //           ),
+                //           Container(
+                //               width: 170,
+                //               height: 36,
+                //               margin: const EdgeInsets.all(0.0),
+                //               padding: const EdgeInsets.only(left: 4),
+                //               decoration: BoxDecoration(border: Border.all(color: Colors.blueAccent)),
+                //               child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+                //                 const Text('Location ON'),
+                //                 Switch(
+                //                   onChanged: toggleSwitch,
+                //                   value: isSwitched,
+                //                   activeColor: Colors.white,
+                //                   activeTrackColor: Colors.red,
+                //                   inactiveThumbColor: Colors.red,
+                //                   inactiveTrackColor: Colors.black,
+                //                 ),
+                //               ])),
+                //         ],
+                //       )),
               body: TabBarView(
                 physics: const BouncingScrollPhysics(),
                 children: [
                   //Tab 1 item
+                  GestureDetector(
+                    onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
+                    child: RefreshIndicator(
+                        displacement: 250,
+                        backgroundColor: Colors.black,
+                        color: Color(0xFFFFD700),
+                        strokeWidth: 3,
+                        onRefresh: () async {
+                          await Future.delayed(Duration(milliseconds: 1500));
+                          setState(() {
+                            dashboard.onInit();
+                          });
+                        },
+                        child: SingleChildScrollView(
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Container(
+                                  margin: const EdgeInsets.only(top: 18),
+                                  padding: const EdgeInsets.only(bottom: 250),
+                                  height: MediaQuery.of(context).size.height / 1.0,
+                                  child: dashboard.pickupAssignList.length == 0
+                                      ? Center(
+                                      child: Text(
+                                        'no_item_found'.tr,
+                                        style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                                      ))
+                                      : RefreshIndicator(
+                                      displacement: 250,
+                                      backgroundColor: Colors.yellow,
+                                      color: Colors.red,
+                                      strokeWidth: 3,
+                                      onRefresh: () async {
+                                        await Future.delayed(Duration(milliseconds: 1500));
+                                        setState(() {
+                                          dashboard.onInit();
+                                        });
+                                      },
+                                      child: ListView.builder(
+                                          itemCount: dashboard.pickupAssignList.length,
+                                          shrinkWrap: true,
+                                          padding: EdgeInsets.zero,
+                                          itemBuilder: (BuildContext context, int index) {
+                                            return InkWell(
+                                              onTap: () {
+                                                setState(() {
+                                                  showPopUp(dashboard.pickupAssignList[index]);
+                                                });
+                                              },
+                                              child: Padding(
+                                                padding: const EdgeInsets.only(bottom: 14.0),
+                                                child: Container(
+                                                  height: 160.h,
+                                                  decoration: BoxDecoration(
+                                                    color: Colors.white,
+                                                    borderRadius: BorderRadius.circular(10),
+                                                    border: Border.all(width: 1, color: kMainColor),
+                                                  ),
+                                                  child: FittedBox(
+                                                    child: Row(
+                                                      children: [
+                                                        Container(
+                                                          margin: const EdgeInsets.symmetric(vertical: 18, horizontal: 10),
+                                                          decoration: BoxDecoration(
+                                                            borderRadius: BorderRadius.circular(50),
+                                                            color: Colors.white,
+                                                            image: DecorationImage(
+                                                              image: AssetImage(Images.parcel),
+                                                              fit: BoxFit.cover,
+                                                            ),
+                                                          ),
+                                                          height: 60.h,
+                                                          width: 60.w,
+                                                        ),
+                                                        Padding(
+                                                          padding: const EdgeInsets.symmetric(vertical: 10.0),
+                                                          child: Column(
+                                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                            children: [
+                                                              Row(
+                                                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                                children: [
+                                                                  SizedBox(
+                                                                    width: 150.w,
+                                                                    child: Text(
+                                                                      dashboard.pickupAssignList[index].merchantName.toString(),
+                                                                      style: const TextStyle(
+                                                                        fontWeight: FontWeight.w500,
+                                                                        fontSize: 14,
+                                                                        color: nameColor,
+                                                                      ),
+                                                                      maxLines: 2,
+                                                                      overflow: TextOverflow.ellipsis,
+                                                                    ),
+                                                                  ),
+                                                                  InkWell(
+                                                                    onTap: () {
+                                                                      Get.back();
+                                                                      showStatusPickupPopUp(dashboard.pickupAssignList[index]);
+                                                                    },
+                                                                    child: SizedBox(
+                                                                      height: 35.h,
+                                                                      child: Card(
+                                                                        elevation: 5,
+                                                                        color: Colors.green,
+                                                                        shape: RoundedRectangleBorder(
+                                                                          borderRadius: BorderRadius.circular(2.0),
+                                                                        ),
+                                                                        child: Padding(
+                                                                          padding: const EdgeInsets.only(left: 5, right: 5, top: 2),
+                                                                          child: Text(
+                                                                            'change_status'.tr,
+                                                                            style: kTextStyle.copyWith(color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold),
+                                                                          ),
+                                                                        ),
+                                                                      ),
+                                                                    ),
+                                                                  ),
+                                                                ],
+                                                              ),
+                                                              Row(children: [
+                                                                Text(
+                                                                  dashboard.pickupAssignList[index].merchantMobile.toString(),
+                                                                  style: const TextStyle(
+                                                                    fontWeight: FontWeight.w400,
+                                                                    fontSize: 14,
+                                                                    color: hintColor,
+                                                                  ),
+                                                                  maxLines: 1,
+                                                                ),
+                                                                SizedBox(
+                                                                  width: 5.w,
+                                                                ),
+                                                                TextButton(
+                                                                  onPressed: () => _launchURL(dashboard.pickupAssignList[index].merchantMobile.toString()),
+                                                                  style: TextButton.styleFrom(
+                                                                      padding: EdgeInsets.zero,
+                                                                      minimumSize: Size(50, 30),
+                                                                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                                                      alignment: Alignment.centerLeft),
+                                                                  child: Row(
+                                                                    children: [
+                                                                      Icon(
+                                                                        Icons.phone,
+                                                                        color: Colors.green,
+                                                                        size: 20,
+                                                                      ),
+                                                                      Text("Call me",
+                                                                          style: TextStyle(
+                                                                            fontWeight: FontWeight.w800,
+                                                                            fontSize: 14,
+                                                                            color: Colors.green,
+                                                                          )),
+                                                                    ],
+                                                                  ),
+                                                                ),
+                                                              ]),
+                                                              Row(
+                                                                children: [
+                                                                  SizedBox(
+                                                                    width: 200.w,
+                                                                    child: Text(
+                                                                      dashboard.pickupAssignList[index].merchantAddress.toString(),
+                                                                      style: const TextStyle(
+                                                                        fontWeight: FontWeight.w400,
+                                                                        fontSize: 12,
+                                                                        color: hintColor,
+                                                                      ),
+                                                                      maxLines: 2,
+                                                                      overflow: TextOverflow.ellipsis,
+                                                                    ),
+                                                                  ),
+                                                                  SizedBox(
+                                                                    width: 5,
+                                                                  ),
+                                                                  TextButton(
+                                                                    onPressed: () {
+                                                                      var url =
+                                                                          'https://www.google.com/maps/dir/?api=1&origin=&destination=${dashboard.pickupAssignList[index].merchantAddress.toString()}&travelmode=driving';
+                                                                      _launchMapURL(Uri.parse(url));
+                                                                    },
+                                                                    style: TextButton.styleFrom(
+                                                                        padding: EdgeInsets.zero,
+                                                                        minimumSize: Size(50, 30),
+                                                                        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                                                        alignment: Alignment.centerLeft),
+                                                                    child: Row(
+                                                                      children: [
+                                                                        Text("Map",
+                                                                            style: TextStyle(
+                                                                              fontWeight: FontWeight.w800,
+                                                                              fontSize: 14,
+                                                                              color: kMainColor,
+                                                                            )),
+                                                                        Icon(
+                                                                          Icons.location_on_outlined,
+                                                                          color: kMainColor,
+                                                                          size: 20,
+                                                                        ),
+                                                                      ],
+                                                                    ),
+                                                                  ),
+                                                                ],
+                                                              ),
+                                                              Row(
+                                                                crossAxisAlignment: CrossAxisAlignment.end,
+                                                                children: [
+                                                                  Text(
+                                                                    '${Get.find<GlobalController>().currency!}${dashboard.pickupAssignList[index].cashCollection.toString()}',
+                                                                    style: const TextStyle(
+                                                                      fontWeight: FontWeight.w400,
+                                                                      fontSize: 12,
+                                                                      color: hintColor,
+                                                                    ),
+                                                                  ),
+                                                                  SizedBox(
+                                                                    width: 30,
+                                                                  ),
+                                                                  Text(
+                                                                    dashboard.pickupAssignList[index].priorityTypeId.toString() == '1' ? 'High' : 'Normal',
+                                                                    style: const TextStyle(
+                                                                      fontWeight: FontWeight.w600,
+                                                                      fontSize: 13,
+                                                                      color: Colors.red,
+                                                                    ),
+                                                                  ),
+                                                                ],
+                                                              ),
+                                                            ],
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                            );
+                                          })),
+                                ),
+                              ],
+                            ),
+                          ),
+                        )),
+                  ),
                   GestureDetector(
                     onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
                     child: RefreshIndicator(
@@ -1230,7 +1494,7 @@ class _DashBoardState extends State<DashBoard> {
                   Row(
                     children: [
                       Text(
-                        'pickup_address'.tr + ':',
+                        'customer_address'.tr + ':',
                         style: kTextStyle.copyWith(color: kTitleColor, fontWeight: FontWeight.bold),
                       ),
                       const Spacer(),
@@ -1239,7 +1503,7 @@ class _DashBoardState extends State<DashBoard> {
                   SizedBox(
                     width: 400,
                     child: Text(
-                      '${parcel.merchantAddress}',
+                      '${parcel.customerAddress}',
                       style: kTextStyle.copyWith(color: kGreyTextColor),
                     ),
                   ),
@@ -1412,6 +1676,21 @@ class _DashBoardState extends State<DashBoard> {
             ),
           ),
           value: "24"),
+    ];
+    return menuItems;
+  }
+
+  List<DropdownMenuItem<String>> get pickupDropdownItems {
+    List<DropdownMenuItem<String>> menuItems = [
+      DropdownMenuItem(
+          child: Text(
+            "RECEIVED_BY_PICKUP_MAN".tr,
+            style: TextStyle(
+              color: kTitleColor,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+          value: '4'),
     ];
     return menuItems;
   }
@@ -1700,6 +1979,186 @@ class _DashBoardState extends State<DashBoard> {
                                     );
                                   }
                                 }
+                              },
+                            )
+                          ],
+                        ),
+                      ],
+                    )),
+              ),
+            ),
+          );
+        });
+  }
+
+  void showStatusPickupPopUp(DeliverymanAssign parcel) {
+    dashboardController.noteController.text = '';
+    showDialog(
+        barrierDismissible: true,
+        context: context,
+        builder: (BuildContext context) {
+          return Dialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(20.0),
+            ),
+            child: SingleChildScrollView(
+              child: Padding(
+                padding: const EdgeInsets.all(10.0),
+                child: Form(
+                    key: _formKey,
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.all(5.0),
+                              child: Text(
+                                'change_status'.tr,
+                                style: kTextStyle.copyWith(color: kTitleColor, fontWeight: FontWeight.bold),
+                              ),
+                            ),
+                            Container(
+                                padding: const EdgeInsets.all(10.0),
+                                decoration: const BoxDecoration(color: kMainColor, shape: BoxShape.circle),
+                                child: const Icon(
+                                  FontAwesomeIcons.x,
+                                  color: kBgColor,
+                                )).onTap(() => finish(context)),
+                          ],
+                        ),
+                        const SizedBox(height: 10.0),
+                        Divider(
+                          thickness: 1.0,
+                          color: kGreyTextColor.withOpacity(0.5),
+                        ),
+                        FormTitle(title: 'select_status'.tr),
+                        dropdownItems.isEmpty
+                            ? Container()
+                            : Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 8.0),
+                          child: Container(
+                            height: 48,
+                            width: double.infinity,
+                            decoration: BoxDecoration(
+                              border: Border.all(
+                                width: 1,
+                                color: hintColor,
+                              ),
+                              borderRadius: BorderRadius.circular(5),
+                            ),
+                            child: ButtonTheme(
+                              alignedDropdown: true,
+                              child: DropdownButtonHideUnderline(
+                                child: DropdownButton(
+                                    isExpanded: true,
+                                    menuMaxHeight: ScreenSize(context).mainHeight / 3,
+                                    items: pickupDropdownItems,
+                                    value: '4',
+                                    onChanged: (String? newValue) {
+                                      (context as Element).markNeedsBuild();
+                                    }),
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 10.0),
+
+                        FormTitle(title: 'note'.tr),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 8.0),
+                          child: TextFormField(
+                            controller: dashboardController.noteController,
+                            textInputAction: TextInputAction.done,
+                            keyboardType: TextInputType.text,
+                            cursorColor: kMainColor,
+                            decoration: InputDecoration(
+                              contentPadding: const EdgeInsets.symmetric(vertical: 30.0, horizontal: 10.0),
+                              errorBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(5.0),
+                                borderSide: BorderSide(
+                                  width: 1,
+                                  color: Colors.red,
+                                ),
+                              ),
+                              focusedErrorBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(5.0),
+                                borderSide: BorderSide(
+                                  width: 1,
+                                  color: Colors.red,
+                                ),
+                              ),
+                              fillColor: Colors.red,
+                              focusedBorder: const OutlineInputBorder(
+                                borderRadius: BorderRadius.only(topLeft: Radius.circular(5), bottomLeft: Radius.circular(5)),
+                                borderSide: BorderSide(width: 1, color: kMainColor),
+                              ),
+                              enabledBorder: const OutlineInputBorder(
+                                borderRadius: BorderRadius.only(
+                                  topLeft: Radius.circular(5),
+                                  bottomLeft: Radius.circular(5),
+                                  topRight: Radius.circular(5),
+                                  bottomRight: Radius.circular(5),
+                                ),
+                                borderSide: BorderSide(width: 1, color: hintColor),
+                              ),
+                            ),
+                            onFieldSubmitted: (value) {
+                              //add code
+                            },
+                          ),
+                        ),
+                        const SizedBox(height: 15.0),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            TextButton(
+                              child: Container(
+                                height: 45,
+                                width: 100,
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(5),
+                                  color: kTitleColor,
+                                ),
+                                child: Center(
+                                  child: Text(
+                                    'cancel'.tr,
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.w600,
+                                      fontSize: 16,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              onPressed: () {
+                                Get.back();
+                              },
+                            ),
+                            TextButton(
+                              child: Container(
+                                height: 45,
+                                width: 100,
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(5),
+                                  color: kMainColor,
+                                ),
+                                child: Center(
+                                  child: Text(
+                                    'yes_sure'.tr,
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.w600,
+                                      fontSize: 16,
+                                      color: kBgColor,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              onPressed: () async {
+                                Get.back();
+                                dashboardController.changePickupStatus(context, parcel.id.toString(), '4');
                               },
                             )
                           ],

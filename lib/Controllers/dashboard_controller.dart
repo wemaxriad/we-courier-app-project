@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer';
 import '/Models/dashboard_model.dart';
 import 'package:flutter/cupertino.dart';
 import '/services/api-list.dart';
@@ -11,6 +12,7 @@ class DashboardController extends GetxController {
   Server server = Server();
   List<Delivered> deliveredList = <Delivered>[];
   List<DeliverymanReSchedule> deliverymanReScheduleList = <DeliverymanReSchedule>[];
+  List<DeliverymanAssign> pickupAssignList = <DeliverymanAssign>[];
   List<DeliverymanAssign> deliverymanAssignList = <DeliverymanAssign>[];
   List<ReturnToCourier> returnToCourierList = <ReturnToCourier>[];
   final TextEditingController cashController = TextEditingController();
@@ -33,16 +35,19 @@ class DashboardController extends GetxController {
     deliveredList = <Delivered>[];
     deliverymanReScheduleList = <DeliverymanReSchedule>[];
     deliverymanAssignList = <DeliverymanAssign>[];
+    pickupAssignList = <DeliverymanAssign>[];
     returnToCourierList = <ReturnToCourier>[];
     server.getRequest(endPoint: APIList.dashboard).then((response) {
       if (response != null && response.statusCode == 200) {
         dashboardLoader = false;
         final jsonResponse = json.decode(response.body);
+        log(jsonResponse.toString());
         var dashboard = DashboardModel.fromJson(jsonResponse);
         dashboardData = dashboard.data!;
         deliveredList.addAll(dashboard.data!.delivered!);
         deliverymanReScheduleList.addAll(dashboard.data!.deliverymanReSchedule!);
         deliverymanAssignList.addAll(dashboard.data!.deliverymanAssign!);
+        pickupAssignList.addAll(dashboard.data!.pickupAssign!);
         returnToCourierList.addAll(dashboard.data!.returnToCourier!);
         update();
       } else {
@@ -72,6 +77,50 @@ class DashboardController extends GetxController {
           filepath: image,
           pickedSignatureImage: pickedSignatureImage,
           type: true)
+          .then((response) {
+        if (response != null) {
+          getDashboard();
+          Get.rawSnackbar(
+            snackPosition: SnackPosition.TOP,
+            title: 'Change Status',
+            message: 'Status Successfully',
+            backgroundColor:CupertinoColors.activeGreen.withOpacity(.9),
+            margin: const EdgeInsets.only(bottom: 20, left: 20, right: 20),
+          );
+          dashboardLoader = false;
+          update();
+        } else {
+          dashboardLoader = false;
+          update();
+        }
+      });
+    }catch(e)
+    {
+      Get.log(e.toString());
+      dashboardLoader = false;
+      update();
+    }
+
+  }
+
+  changePickupStatus(context,parcelId,status) {
+    dashboardLoader = true;
+    update();
+    Map<String, String> body = {
+      'parcel_id': parcelId,
+      'status_action': status,
+      'cash_collection': cashController.text,
+      'note': noteController.text,
+    };
+    print(body);
+    try{
+      server
+          .multipartFileRequest(
+          endPoint: APIList.changeStatus,
+          body: body,
+          filepath: null,
+          pickedSignatureImage: null,
+          type: false)
           .then((response) {
         if (response != null) {
           getDashboard();

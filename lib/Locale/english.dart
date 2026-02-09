@@ -33,6 +33,7 @@ Map<String, String> english =
   'courier':"Courier",
   'shop_name':"Shop Name",
   'pickup_address':"Pickup Address",
+  'customer_address':"Customer Address",
   'cash_collection':"Cash Collection",
   'select_status':"Select Status",
   'address':"Address*",
@@ -104,7 +105,7 @@ Map<String, String> english =
   're_schedule': 'ReSchedule',
   'return': 'Return',
   'no_item_found': 'No items found',
-  'delivered_pending': 'Pending',
+  'delivered_pending': 'Delivery',
   'change_status': 'Change Status',
   'cash_collection_tk': 'Cash Collection(Tk)',
   'please_type_your_amount': 'Please type your amount',
@@ -119,6 +120,9 @@ Map<String, String> english =
   'new_password':"New Password",
   'old_password':"Old Password",
   'retype_new_password':"Retype New Password",
+  'pickup_assign': "Pickup",
+  'RECEIVED_BY_PICKUP_MAN': "Received By Pickup Man",
+  'RECEIVED_BY_DELIVERY_MAN': "Received By Delivery Man",
 
 
 };

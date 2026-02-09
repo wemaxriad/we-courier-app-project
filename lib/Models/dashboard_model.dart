@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 class DashboardModel {
   DashboardModel({
       bool? success, 
@@ -36,9 +38,11 @@ class DashboardModel {
 class DataDashboard {
   DataDashboard({
       List<DeliverymanAssign>? deliverymanAssign, 
-      List<DeliverymanReSchedule>? deliverymanReSchedule, 
+      List<DeliverymanAssign>? pickupAssign,
+      List<DeliverymanReSchedule>? deliverymanReSchedule,
       List<ReturnToCourier>? returnToCourier,
       List<Delivered>? delivered,}){
+    _pickupAssign = pickupAssign;
     _deliverymanAssign = deliverymanAssign;
     _deliverymanReSchedule = deliverymanReSchedule;
     _returnToCourier = returnToCourier;
@@ -46,6 +50,12 @@ class DataDashboard {
 }
 
   DataDashboard.fromJson(dynamic json) {
+    if (json['pickup_assign'] != null) {
+      _pickupAssign = [];
+      json['pickup_assign'].forEach((v) {
+        _pickupAssign?.add(DeliverymanAssign.fromJson(v));
+      });
+    }
     if (json['deliveryman_assign'] != null) {
       _deliverymanAssign = [];
       json['deliveryman_assign'].forEach((v) {
@@ -71,12 +81,14 @@ class DataDashboard {
       });
     }
   }
+  List<DeliverymanAssign>? _pickupAssign;
   List<DeliverymanAssign>? _deliverymanAssign;
   List<DeliverymanReSchedule>? _deliverymanReSchedule;
   List<ReturnToCourier>? _returnToCourier;
   List<Delivered>? _delivered;
 
   List<DeliverymanAssign>? get deliverymanAssign => _deliverymanAssign;
+  List<DeliverymanAssign>? get pickupAssign => _pickupAssign;
   List<DeliverymanReSchedule>? get deliverymanReSchedule => _deliverymanReSchedule;
   List<ReturnToCourier>? get returnToCourier => _returnToCourier;
   List<Delivered>? get delivered => _delivered;
@@ -85,6 +97,9 @@ class DataDashboard {
     final map = <String, dynamic>{};
     if (_deliverymanAssign != null) {
       map['deliveryman_assign'] = _deliverymanAssign?.map((v) => v.toJson()).toList();
+    }
+    if (_pickupAssign != null) {
+      map['pickup_assign'] = _pickupAssign?.map((v) => v.toJson()).toList();
     }
     if (_deliverymanReSchedule != null) {
       map['deliveryman_re_schedule'] = _deliverymanReSchedule?.map((v) => v.toJson()).toList();
