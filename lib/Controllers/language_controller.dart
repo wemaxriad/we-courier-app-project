@@ -12,22 +12,22 @@ class LanguageController extends GetxController {
       langName: 'English',
       locale: const Locale('en', 'US'),
     ),
-     Language(
-      langName: 'Spanish',
-      locale: const Locale('es', 'SV'),
-    ),
+    //  Language(
+    //   langName: 'Spanish',
+    //   locale: const Locale('es', 'SV'),
+    // ),
     Language(
       langName: 'Bangla',
       locale: const Locale('bn', 'BD'),
     ),
-    Language(
-      langName: 'हिन्दी',
-      locale: const Locale('hi', 'IN'),
-    ),
-    Language(
-      langName: 'عربي',
-      locale: const Locale('ar', 'AR'),
-    )
+    // Language(
+    //   langName: 'हिन्दी',
+    //   locale: const Locale('hi', 'IN'),
+    // ),
+    // Language(
+    //   langName: 'عربي',
+    //   locale: const Locale('ar', 'AR'),
+    // )
   ];
 
   changeLanguage(String value) {

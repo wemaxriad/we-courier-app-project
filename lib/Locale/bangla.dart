@@ -104,7 +104,7 @@ Map<String, String> bangla =
 'select_hub':"হাব নির্বাচন করুন",
 'mobile':"মুঠোফোন*",
 'i_agree_to':"আামি রাজি",
-'e_courier':"ই-কুরিয়ার",
+'e_courier':"CourierX",
 'privacy_Policy_&_terms':"গোপনীয়তা নীতি এবং শর্তাবলী",
 'register_my_account':"আমার অ্যাকাউন্ট নিবন্ধন করুন",
 'already_member':"ইতিমধ্যে সদস্য ?",

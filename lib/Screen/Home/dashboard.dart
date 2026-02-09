@@ -121,18 +121,33 @@ class _DashBoardState extends State<DashBoard> {
       appBar: AppBar(
         iconTheme: const IconThemeData(color: Colors.white),
         titleSpacing: 0,
-        backgroundColor: kMainColor,
+        backgroundColor: kTitleColor,
+        centerTitle: false,
         elevation: 0.0,
         title: ListTile(
           horizontalTitleGap: 0,
           contentPadding: const EdgeInsets.all(10.0),
-          title: Text(
-            '${Get.find<GlobalController>().siteName }',
-            style: kTextStyle.copyWith(
-                color: Colors.white,
-                fontSize: 20.0,
-                fontWeight: FontWeight.bold),
+          title: Row(
+            mainAxisAlignment: MainAxisAlignment.start, // ছবিটা বাম দিকে রাখবে
+            children: [
+              Padding(
+                padding: const EdgeInsets.only(left: 8.0), // Optional: একটু বাম প্যাডিং দিতে পারো
+                child: Image.asset(
+                  'assets/images/logo01.png',
+                  width: 120,
+                  height: 60,
+                  fit: BoxFit.contain,
+                ),
+              ),
+            ],
           ),
+          // Text(
+          //   '${Get.find<GlobalController>().siteName }',
+          //   style: kTextStyle.copyWith(
+          //       color: Colors.white,
+          //       fontSize: 20.0,
+          //       fontWeight: FontWeight.bold),
+          // ),
         ),
         actions: [
           Padding(
@@ -260,7 +275,7 @@ class _DashBoardState extends State<DashBoard> {
                       Container(
                         width: double.infinity,
                         decoration: BoxDecoration(
-                          color: kMainColor, // Background color
+                          color: kTitleColor, // Background color
                           borderRadius: BorderRadius.only(
                             bottomLeft: Radius.circular(25.r),  // Bottom-left radius
                             bottomRight: Radius.circular(25.r), // Bottom-right radius

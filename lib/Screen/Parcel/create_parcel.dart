@@ -374,13 +374,31 @@ class _CreateParcelState extends State<CreateParcel> {
                                       ),
                                     ),
                                     const SizedBox(height: 20.0),
-                                    Column(
-                                      mainAxisAlignment: MainAxisAlignment.center,
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: <Widget>[
-                                        FlutterGooglePlacesWeb(apiKey: APIList.mapGoogleApiKey!, required: true, controller: parcel.customerAddressController),
-                                      ],
+                                    AppTextField(
+                                      controller: parcel.customerAddressController,
+                                      validator: (value) {
+                                        if ( parcel.customerAddressController.text.isEmpty) {
+                                          return "this_field_can_t_be_empty".tr;
+                                        }
+                                        return null;
+                                      },
+                                      cursorColor: kTitleColor,
+                                      textFieldType: TextFieldType.NAME,
+                                      textAlign: TextAlign.start,
+                                      decoration: kInputDecoration.copyWith(
+                                        labelText: 'customer_address'.tr+'*',
+                                        labelStyle: kTextStyle.copyWith(color: kTitleColor),
+                                        contentPadding: const EdgeInsets.symmetric(
+                                            vertical: 30, horizontal: 10.0),
+                                      ),
                                     ),
+                                    // Column(
+                                    //   mainAxisAlignment: MainAxisAlignment.center,
+                                    //   mainAxisSize: MainAxisSize.min,
+                                    //   children: <Widget>[
+                                    //     FlutterGooglePlacesWeb(apiKey: APIList.mapGoogleApiKey!, required: true, controller: parcel.customerAddressController),
+                                    //   ],
+                                    // ),
                                     const SizedBox(height: 20.0),
                                     TextFormField(
                                       controller: parcel.noteController,
@@ -489,9 +507,8 @@ class _CreateParcelState extends State<CreateParcel> {
                                             FocusScope.of(context).requestFocus(new FocusNode());
                                             if (_formKey.currentState!.validate()) {
                                               if (parcel.deliveryChargesID != '' && parcel.deliveryTypID != '') {
-                                                parcel.customerAddressController.text = FlutterGooglePlacesWeb.value['name'] ?? '';
-                                                parcel.customerAddressLatController.text = FlutterGooglePlacesWeb.value['lat'] ?? '';
-                                                parcel.customerAddressLongController.text = FlutterGooglePlacesWeb.value['long'] ?? '';
+                                                parcel.customerAddressLatController.text =  '';
+                                                parcel.customerAddressLongController.text = '';
                                                 parcel.calculateTotal(context);
                                               } else if (parcel.deliveryChargesID == '') {
                                                 Get.rawSnackbar(message: "Please select category", backgroundColor: Colors.red, snackPosition: SnackPosition.TOP);

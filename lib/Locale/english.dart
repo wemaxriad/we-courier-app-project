@@ -64,7 +64,7 @@ Map<String, String> english =
 
   //translate 13-8-2022
   'merchant': "Merchant",
-  'we_courier':"We Courier",
+  'we_courier':"CourierX",
   'reset_password':'Reset Password',
   'email_mobile':"Email/Mobile*",
   'password':'Password*',
@@ -90,7 +90,7 @@ Map<String, String> english =
   'select_hub':"Select Hub",
   'mobile':"Mobile*",
   'i_agree_to':"I agree to",
-  'e_courier':"E-Courier",
+  'e_courier':"CourierX",
   'privacy_Policy_&_terms':"Privacy Policy & Terms",
   'register_my_account':"Register My Account",
   'already_member':"Already Member ?",
@@ -168,7 +168,7 @@ Map<String, String> english =
   'pickup_re_schedule_cancel':"Pickup Re Schedule Cancel",
   'pickup_re_schedule':"Pickup Re Schedule",
   'shop_name':"Shop Name",
-  'we_courier_ltd':"We Courier Ltd",
+  'we_courier_ltd':"CourierX",
   'phone':"Phone",
   'parcel_info':"Parcel Info",
   'tracking_id':"Tracking Id",

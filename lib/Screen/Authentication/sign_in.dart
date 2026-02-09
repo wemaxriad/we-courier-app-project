@@ -38,7 +38,7 @@ class _SignInState extends State<SignIn> {
       SafeArea(
       child: Scaffold(
         resizeToAvoidBottomInset: false,
-        backgroundColor: kMainColor,
+        backgroundColor: kBgColor,
         body: Stack(children: [
         Center(
         child:
@@ -49,7 +49,7 @@ class _SignInState extends State<SignIn> {
             ),
              Center(
               child:  Container(
-                margin: EdgeInsets.only(right: 30),
+                margin: EdgeInsets.only(right: 30,left: 30),
                 height: 120,
                 decoration: BoxDecoration(
                   image: DecorationImage(
@@ -64,7 +64,7 @@ class _SignInState extends State<SignIn> {
             ),
             Text(
               'please_enter_your_user_information'.tr,
-              style: kTextStyle.copyWith(color: Colors.white, fontSize: 18.0),
+              style: kTextStyle.copyWith(color: kMainColor, fontSize: 18.0),
               textAlign: TextAlign.center,
             ),
             const SizedBox(
@@ -73,14 +73,14 @@ class _SignInState extends State<SignIn> {
             Expanded(
               child: Container(
                 decoration: const BoxDecoration(
-                  color: Colors.white,
+                  color: kTitleColor,
                   borderRadius: BorderRadius.only(
                     topLeft: Radius.circular(30.0),
                     topRight: Radius.circular(30.0),
                   ),
                 ),
                 child: Padding(
-                  padding: const EdgeInsets.all(10.0),
+                  padding: const EdgeInsets.all(15.0),
                   child:  Form(
                     key: _formKey,
                     child:
@@ -103,6 +103,7 @@ class _SignInState extends State<SignIn> {
                           labelStyle: kTextStyle.copyWith(color: kTitleColor),
                           hintText: 'courier@gmail.com',
                           hintStyle: kTextStyle.copyWith(color: kGreyTextColor),
+                          filled: true,fillColor: kBgColor,
                           suffixIcon:
                               const Icon(Icons.mail, color: kGreyTextColor),
                         ),
@@ -125,6 +126,7 @@ class _SignInState extends State<SignIn> {
                           labelStyle: kTextStyle.copyWith(color: kTitleColor),
                           hintText: '********',
                           hintStyle: kTextStyle.copyWith(color: kGreyTextColor),
+                          filled: true,fillColor: kBgColor,
                         ),
                       ),
                       const SizedBox(height: 10.0),
@@ -148,7 +150,7 @@ class _SignInState extends State<SignIn> {
                           Text(
                             'remember_me'.tr,
                             style: kTextStyle.copyWith(
-                                color: kTitleColor,
+                                color: kMainColor,
                                 fontWeight: FontWeight.bold),
                           ),
                           const Spacer(),
@@ -162,28 +164,40 @@ class _SignInState extends State<SignIn> {
                         ],
                       ),
                       const SizedBox(height: 30.0),
-                      ButtonGlobal(
-                          buttontext: 'sign_in'.tr,
-                          buttonDecoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(30.0),
-                              color: kMainColor),
-                          onPressed: () async {
-                              if (_formKey.currentState!.validate()) {
-                                auth.loginOnTap(
-                                    email: _emailController.text
-                                        .toString()
-                                        .trim(),
-                                    pass: _passwordController.text
-                                        .toString()
-                                        .trim());
-                              }
-                          },
-                         ),
+                    TextButton(
+                      onPressed: () async {
+                        if (_formKey.currentState!.validate()) {
+                          auth.loginOnTap(
+                              email: _emailController.text
+                                  .toString()
+                                  .trim(),
+                              pass: _passwordController.text
+                                  .toString()
+                                  .trim());
+                        }
+                      },
+                      child: Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.only(top: 12.0, bottom: 12.0,),
+                        decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(30.0),
+                            color: kBgColor),
+                        child: Center(
+                          child: Text(
+                              'sign_in'.tr,
+                            style: kTextStyle.copyWith(
+                                fontSize: 18.0,
+                                color: kMainColor,
+                                fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                      ),
+                    ),
                       const SizedBox(height: 10.0),
                       RichText(
                         text: TextSpan(
                           text: 'dont_have_an_account'.tr,
-                          style: kTextStyle.copyWith(color: kTitleColor),
+                          style: kTextStyle.copyWith(color: kBgColor),
                           children: [
                             TextSpan(
                                 text: 'sign_up_here'.tr,

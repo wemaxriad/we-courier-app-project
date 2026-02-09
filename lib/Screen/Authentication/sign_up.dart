@@ -33,7 +33,7 @@ class _SignUpState extends State<SignUp> {
     SizeConfigCustom sizeConfig = SizeConfigCustom();
     sizeConfig.init(context);
     return Scaffold(
-      backgroundColor: kMainColor,
+      backgroundColor: kBgColor,
       body: GetBuilder<AuthController>(
     init: AuthController(),
     builder: (auth) =>
@@ -47,7 +47,7 @@ class _SignUpState extends State<SignUp> {
               height: 40,
             ),
             Container(
-              margin: EdgeInsets.only(right: 30),
+              margin: EdgeInsets.only(right: 30,left: 30),
               height: 120,
               decoration: BoxDecoration(
                 image: DecorationImage(
@@ -60,28 +60,28 @@ class _SignUpState extends State<SignUp> {
             Text(
               'registration_form'.tr,
               style: kTextStyle.copyWith(
-                  color: Colors.white,
+                  color: kMainColor,
                   fontWeight: FontWeight.bold,
                   fontSize: 20.0),
             ),
             const SizedBox(height: 5.0),
             Text(
               'please_enter_your_user_information'.tr,
-              style: kTextStyle.copyWith(color: Colors.white),
+              style: kTextStyle.copyWith(color: kMainColor),
             ),
             const SizedBox(
               height: 30,
             ),
             Container(
               decoration: const BoxDecoration(
-                color: Colors.white,
+                color: kTitleColor,
                 borderRadius: BorderRadius.only(
                   topLeft: Radius.circular(30.0),
                   topRight: Radius.circular(30.0),
                 ),
               ),
               child: Padding(
-                padding: const EdgeInsets.all(10),
+                padding: const EdgeInsets.all(15),
                 child:
                 Form(
                   key: _formKey,
@@ -105,6 +105,7 @@ class _SignUpState extends State<SignUp> {
                               labelText: 'business_name'.tr,
                               labelStyle: kTextStyle.copyWith(color: kTitleColor),
                               hintText: 'wecourier'.tr,
+                              filled: true,fillColor: kBgColor,
                               hintStyle: kTextStyle.copyWith(color: kGreyTextColor),
                             ),
                           ),
@@ -124,6 +125,7 @@ class _SignUpState extends State<SignUp> {
                               labelText: 'first_name'.tr,
                               labelStyle: kTextStyle.copyWith(color: kTitleColor),
                               hintText: 'we'.tr,
+                              filled: true,fillColor: kBgColor,
                               hintStyle: kTextStyle.copyWith(color: kGreyTextColor),
                             ),
                           ),
@@ -143,6 +145,7 @@ class _SignUpState extends State<SignUp> {
                               labelText: 'last_name'.tr,
                               labelStyle: kTextStyle.copyWith(color: kTitleColor),
                               hintText: 'courier'.tr,
+                              filled: true,fillColor: kBgColor,
                               hintStyle: kTextStyle.copyWith(color: kGreyTextColor),
                             ),
                           ),
@@ -159,6 +162,7 @@ class _SignUpState extends State<SignUp> {
                             textAlign: TextAlign.start,
                             decoration: kInputDecoration.copyWith(
                               labelText: 'address'.tr,
+                              filled: true,fillColor: kBgColor,
                               labelStyle: kTextStyle.copyWith(color: kTitleColor),
                               contentPadding: const EdgeInsets.symmetric(
                                   vertical: 30, horizontal: 10.0),
@@ -174,6 +178,7 @@ class _SignUpState extends State<SignUp> {
                                     floatingLabelBehavior: FloatingLabelBehavior.always,
                                     labelText: 'hub'.tr,
                                     hintText: 'select_hub'.tr,
+                                    filled: true,fillColor: kBgColor,
                                     labelStyle: kTextStyle.copyWith(color: kTitleColor),
                                     border: OutlineInputBorder(
                                       borderRadius: BorderRadius.circular(5.0),
@@ -211,6 +216,7 @@ class _SignUpState extends State<SignUp> {
                               labelText: 'mobile'.tr,
                               labelStyle: kTextStyle.copyWith(color: kTitleColor),
                               hintText: '017XXXXXXXX',
+                              filled: true,fillColor: kBgColor,
                               hintStyle: kTextStyle.copyWith(color: kGreyTextColor),
                             ),
                           ),
@@ -230,6 +236,7 @@ class _SignUpState extends State<SignUp> {
                               labelText: 'password'.tr,
                               labelStyle: kTextStyle.copyWith(color: kTitleColor),
                               hintText: '********',
+                              filled: true,fillColor: kBgColor,
                               hintStyle: kTextStyle.copyWith(color: kGreyTextColor),
                             ),
                           ),
@@ -255,17 +262,17 @@ class _SignUpState extends State<SignUp> {
                                 child: RichText(
                                   text: TextSpan(
                                       text: 'i_agree_to'.tr,
-                                      style: kTextStyle.copyWith(color: kTitleColor),
+                                      style: kTextStyle.copyWith(color: kMainColor),
                                       children: [
                                         TextSpan(
                                           text: 'e_courier'.tr,
                                           style: kTextStyle.copyWith(
-                                              color: kGreyTextColor),
+                                              color: kBgColor),
                                         ),
                                         TextSpan(
                                           text: 'privacy_Policy_&_terms'.tr,
                                           style:
-                                          kTextStyle.copyWith(color: kTitleColor),
+                                          kTextStyle.copyWith(color: kMainColor),
                                         )
                                       ]),
                                 ),
@@ -274,22 +281,36 @@ class _SignUpState extends State<SignUp> {
                           ),
                           const SizedBox(height: 20.0),
                     SizedBox( height: 70,
-                        child:
-                          ButtonGlobal(
-                              buttontext: 'register_my_account'.tr,
-                              buttonDecoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(30.0),
-                                  color: kMainColor),
-                              onPressed: () async {
-                                if (_formKey.currentState!.validate()) {
-                                 await auth.signupOnTap(hub);
-                                }
-                              })),
+                        child: TextButton(
+                          onPressed: () async {
+                            if (_formKey.currentState!.validate()) {
+                              await auth.signupOnTap(hub);
+                            }
+                          },
+                          child: Container(
+                            width: double.infinity,
+                            padding: const EdgeInsets.only(top: 12.0, bottom: 12.0,),
+                            decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(30.0),
+                                color: kBgColor),
+                            child: Center(
+                              child: Text(
+                                'register_my_account'.tr,
+                                style: kTextStyle.copyWith(
+                                    fontSize: 18.0,
+                                    color: kMainColor,
+                                    fontWeight: FontWeight.bold),
+                              ),
+                            ),
+                          ),
+                        ),
+
+                    ),
                     Flexible(child:
                           RichText(
                             text: TextSpan(
                               text: 'already_member'.tr,
-                              style: kTextStyle.copyWith(color: kGreyTextColor),
+                              style: kTextStyle.copyWith(color: kBgColor),
                               children: [
                                 TextSpan(
                                   text: 'login_here'.tr,

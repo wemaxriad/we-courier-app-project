@@ -15,7 +15,7 @@ class DashboardController extends GetxController {
   bool dashboardLoader = true;
   bool commonLoader = false;
   bool loader = false;
-  late DataDashboard dashboardData;
+  DataDashboard dashboardData = DataDashboard();
   List<NewsOffers> offersList = <NewsOffers>[];
 
 
@@ -28,9 +28,12 @@ class DashboardController extends GetxController {
 
   getDashboard() {
     server.getRequest(endPoint: APIList.dashboard).then((response) {
+      final jsonResponse = json.decode(response.body);
+      print(jsonResponse);
       if (response != null && response.statusCode == 200) {
         dashboardLoader = false;
         final jsonResponse = json.decode(response.body);
+        print(jsonResponse);
         var dashboard = DashboardModel.fromJson(jsonResponse);
         dashboardData = dashboard.data!;
         Future.delayed(Duration(milliseconds: 10), () {

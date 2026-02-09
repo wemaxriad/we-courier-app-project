@@ -1,4 +1,4 @@
-package com.wecourier.merchant
+package com.courierx.merchant
 
 import io.flutter.embedding.android.FlutterActivity
 
