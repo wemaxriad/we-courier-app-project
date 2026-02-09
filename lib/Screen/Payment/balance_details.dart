@@ -1,138 +1,245 @@
-import '/Controllers/balance_controller.dart';
-import '/Screen/Parcel/clearable_parcel.dart';
-import '/Screen/Payment/PaymentRequest/create_payment_request.dart';
-import '/Screen/Widgets/button_global.dart';
-import '/Screen/Widgets/shimmer/deliveryCharge_shimmer.dart';
-import '/Screen/Widgets/shimmer/profile_shimmer.dart';
+import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:nb_utils/nb_utils.dart';
 
+import '/Controllers/balance_controller.dart';
+import '/Screen/Parcel/clearable_parcel.dart';
+import '/Screen/Payment/PaymentRequest/create_payment_request.dart';
 import '../Widgets/constant.dart';
 
-class BalanceDetails extends StatefulWidget {
-  const BalanceDetails({Key? key}) : super(key: key);
+class BalanceDetails extends StatelessWidget {
+  BalanceDetails({Key? key}) : super(key: key);
 
-  @override
-  State<BalanceDetails> createState() => _BalanceDetailsState();
-}
+  final BalanceController balanceController =
+  Get.put(BalanceController()); // ✅ single instance
 
-class _BalanceDetailsState extends State<BalanceDetails> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: kMainColor,
+      backgroundColor: Colors.blueGrey.shade50,
       appBar: AppBar(
         title: Text(
           'Balance Details'.tr,
-          style: kTextStyle.copyWith(color: kBgColor,fontWeight: FontWeight.w600),
+          style: kTextStyle.copyWith(
+            color: kBgColor,
+            fontWeight: FontWeight.w500,
+            fontSize: 12,
+          ),
         ),
         backgroundColor: kMainColor,
-        elevation: 0.0,
+        elevation: 0,
         iconTheme: const IconThemeData(color: kBgColor),
       ),
+
+      // ✅ Body
       body: GetBuilder<BalanceController>(
-        init: BalanceController(),
-        builder: (balanceController) {
+        builder: (controller) {
+          final double balance =
+              controller.balanceDetails.currentBalance ?? 0.0;
 
-          return Container(
-              padding: const EdgeInsets.all(10.0),
-              width: MediaQuery.of(context).size.width,
-              height: double.infinity,
-              decoration: const BoxDecoration(
-                borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(30.0),
-                  topRight: Radius.circular(30.0),
-                ),
-                color: Colors.white,
-              ),
-              child: SingleChildScrollView(
-                child: Container(
-                  child: balanceController.loader? DeliveryChargeShimmer() : Column(
-                    children: [
+          final bool isEnabled = balance > 0;
+          if (controller.loader) {
+            return const Center(child: CircularProgressIndicator());
+          }
 
-                      Container(
-                        padding: EdgeInsets.symmetric(horizontal: 10,vertical: 10),
-                        margin: EdgeInsets.symmetric(horizontal: 5,vertical: 10),
-                        decoration: BoxDecoration(
-                          color: kBorderColorTextField,
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.stretch,
-                          children: [
-                            Text("Balance Details",style:TextStyle(fontSize: 17,color: kTitleColor,fontWeight: FontWeight.bold,)),
-                            SizedBox(height: 20,),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text("Amount Delivered",style:TextStyle(fontSize: 15,color: kTitleColor,fontWeight: FontWeight.w500,)),
-                                Text("${balanceController.balanceDetails.amountDelivered!.toStringAsFixed(2)}",style:TextStyle(fontSize: 15,color: kTitleColor,fontWeight: FontWeight.w500,)),
-                              ],
-                            ),
-                            SizedBox(height: 20,),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text("Payable Delivery Charge",style:TextStyle(fontSize: 15,color: kTitleColor,fontWeight: FontWeight.w500,)),
-                                Text("${balanceController.balanceDetails.payableDeliveryCharge!.toStringAsFixed(2)}",style:TextStyle(fontSize: 15,color: kTitleColor,fontWeight: FontWeight.w500,)),
-                              ],
-                            ),
-                            SizedBox(height: 20,),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text("Sub Total",style:TextStyle(fontSize: 15,color: kTitleColor,fontWeight: FontWeight.w500,)),
-                                Text("${balanceController.balanceDetails.subTotal!.toStringAsFixed(2)}",style:TextStyle(fontSize: 15,color: kTitleColor,fontWeight: FontWeight.w500,)),
-                              ],
-                            ),
-                            SizedBox(height: 20,),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text("COD Charte",style:TextStyle(fontSize: 15,color: kTitleColor,fontWeight: FontWeight.w500,)),
-                                Text("${balanceController.balanceDetails.codCharge!.toStringAsFixed(2)}",style:TextStyle(fontSize: 15,color: kTitleColor,fontWeight: FontWeight.w500,)),
-                              ],
-                            ),
-                            SizedBox(height: 25,),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text("Available Balance",style:TextStyle(fontSize: 17,color: kTitleColor,fontWeight: FontWeight.w700,)),
-                                Text("${balanceController.balanceDetails.availableBalance!.toStringAsFixed(2)}",style:TextStyle(fontSize: 17,color: kTitleColor,fontWeight: FontWeight.bold,)),
-                              ],
-                            ),
-                            SizedBox(height: 40,),
-                            InkWell(
-                              onTap: (){
-                                ClearableParcels().launch(context);
-                              },
-                              child: Container(
-                                padding: EdgeInsets.symmetric(vertical: 9,horizontal: 7),
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(5),
-                                  border: Border.all(color: kMainColor,width: 2)
-                                ),
-                                child: Text("Cleanable Parcels (${balanceController.balanceDetails.clearableParcels})",textAlign: TextAlign.center,style:TextStyle(fontSize: 18,color: kMainColor,fontWeight: FontWeight.w600,)),
-                              ),
-
-                            ),
-                            SizedBox(height: 20,),
-                          ],
-                        ),
+          return RefreshIndicator(
+            onRefresh: controller.getBalanceDetails,
+            child: SingleChildScrollView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              child: Padding(
+                padding:
+                const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                child: Column(
+                  children: [
+                    /// 🔹 Wallet Card
+                    Container(
+                      padding: const EdgeInsets.all(20),
+                      width: double.infinity,
+                      decoration: BoxDecoration(
+                        color: kMainColor,
+                        borderRadius: BorderRadius.circular(8),
                       ),
-                      // ButtonGlobal(
-                      //     buttontext: 'payment_request'.tr,
-                      //     buttonDecoration: kButtonDecoration.copyWith(boxShadow:  [BoxShadow(color: Colors.black.withOpacity(.2),blurRadius: 5,offset: Offset(0,2))]),
-                      //     onPressed: () {
-                      //       CreatePaymentRequest(balanceDetails: balanceController.balanceDetails,).launch(context);
-                      //     }),
-                    ],
-                  ),
+                      child: Column(
+                        children: [
+                          const Text(
+                            'My Wallet',
+                            style: TextStyle(color: white, fontSize: 16),
+                          ),
+                          const SizedBox(height: 10),
+                          Text(
+                            "৳${controller.balanceDetails.currentBalance?.toStringAsFixed(2) ?? '0.00'}",
+                            style: const TextStyle(
+                              color: white,
+                              fontSize: 30,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+                          const Text(
+                            'You can request payment for this amount',
+                            style: TextStyle(color: white, fontSize: 12),
+                          ),
+                        ],
+                      ),
+                    ),
+
+                    const SizedBox(height: 20),
+
+                    /// 🔹 Summary
+                    Container(
+                      padding: const EdgeInsets.all(20),
+                      decoration: BoxDecoration(
+                        color: white,
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text(
+                            'Balance Summary',
+                            style: TextStyle(
+                                fontSize: 14, fontWeight: FontWeight.w600),
+                          ),
+                          const SizedBox(height: 10),
+
+                          _row(
+                            "Amount Delivered",
+                            controller.balanceDetails.amountDelivered,
+                          ),
+                          _row(
+                            "Payable Delivery Charge",
+                            controller.balanceDetails.payableDeliveryCharge,
+                          ),
+                          _row(
+                            "Sub Total",
+                            controller.balanceDetails.subTotal,
+                          ),
+                          _row(
+                            "COD Charge",
+                            controller.balanceDetails.codCharge,
+                          ),
+
+                          const SizedBox(height: 10),
+                          const Divider(),
+
+                          _row(
+                            "Total",
+                            controller.balanceDetails.availableBalance,
+                            bold: true,
+                          ),
+
+                          const SizedBox(height: 12),
+
+                          /// 🔹 Clearable Consignments
+                          InkWell(
+                            onTap: () {
+                              ClearableParcels().launch(context);
+                            },
+                            child: DottedBorder(
+                              color: const Color(0xFF4DB6AC),
+                              strokeWidth: 1.2,
+                              dashPattern: const [6, 4],
+                              borderType: BorderType.RRect,
+                              radius: const Radius.circular(10),
+                              child: Container(
+                                width: double.infinity,
+                                padding:
+                                const EdgeInsets.symmetric(vertical: 12),
+                                alignment: Alignment.center,
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFFE0F2F1),
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                child: Text(
+                                  'Clearable Consignments: ${controller.balanceDetails.clearableParcels ?? 0}',
+                                  style: const TextStyle(
+                                    color: Color(0xFF009688),
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    SizedBox(height: 20,),
+                    // Container(
+                    //   height: 60,
+                    //   padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                    //   decoration: const BoxDecoration(color: white),
+                    //   child: GestureDetector(
+
+                    //       onTap: isEnabled
+                    //           ? ()  async {
+                    //         await CreatePaymentRequest(
+                    //           balanceDetails: balanceController.balanceDetails,
+                    //         ).launch(context);
+
+                    //         // 🔁 refresh after payment request
+                    //         balanceController.getBalanceDetails();
+                    //       }
+                    //           : () {
+                    //         Get.snackbar(
+                    //           'Insufficient Balance',
+                    //           'You need a positive balance to request payment',
+                    //         );
+                    //       },
+
+                    //     child: Container(
+                    //       decoration: BoxDecoration(
+                    //         color: isEnabled
+                    //             ? kMainColor            // ✅ ENABLED color
+                    //             : gray.withOpacity(0.6), // ❌ DISABLED color
+                    //         borderRadius: BorderRadius.circular(6),
+                    //       ),
+                    //       // decoration: BoxDecoration(
+                    //       //   color: gray.withOpacity(0.6),
+                    //       //   borderRadius: BorderRadius.circular(4),
+                    //       // ),
+                    //       child: Row(
+                    //         mainAxisAlignment: MainAxisAlignment.center,
+                    //         children: [
+                    //           Icon(
+                    //             isEnabled ? Icons.payment : Icons.lock,
+                    //             color: white.withOpacity(isEnabled ? 1 : 0.6),
+                    //             size: 18,
+                    //           ),
+                    //           const SizedBox(width: 6),
+                    //           Text('Payment Request', style: TextStyle(color: white))
+                    //         ],
+                    //       ),
+
+                    //     ),
+                    //   ),
+                    // )
+                  ],
                 ),
-              )
+              ),
+            ),
           );
-        }
+        },
+      ),
+    );
+  }
+
+  /// 🔹 Reusable Row Widget
+  Widget _row(String title, double? value, {bool bold = false}) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 10),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(title, style: TextStyle(color: grayColor)),
+          Text(
+            "৳${value?.toStringAsFixed(2) ?? '0.00'}",
+            style: TextStyle(
+              fontWeight: bold ? FontWeight.w600 : FontWeight.w500,
+            ),
+          ),
+        ],
       ),
     );
   }
