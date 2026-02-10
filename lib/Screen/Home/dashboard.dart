@@ -141,13 +141,6 @@ class _DashBoardState extends State<DashBoard> {
               ),
             ],
           ),
-          // Text(
-          //   '${Get.find<GlobalController>().siteName }',
-          //   style: kTextStyle.copyWith(
-          //       color: Colors.white,
-          //       fontSize: 20.0,
-          //       fontWeight: FontWeight.bold),
-          // ),
         ),
         actions: [
           Padding(
@@ -310,7 +303,7 @@ class _DashBoardState extends State<DashBoard> {
                               SizedBox(height: 10.h,),
                               InkWell(
                                 onTap: (){
-                                  const BalanceDetails().launch(context);
+                                   BalanceDetails().launch(context);
                                 },
                                 child: Container(
                                   padding: EdgeInsets.all(16.w),

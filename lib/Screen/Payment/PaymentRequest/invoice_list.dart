@@ -77,6 +77,7 @@ class _InvoiceListState extends State<InvoiceList> {
                       child: InkWell(
                         onTap: (){
                           InvoiceDetails(invoiceId: request.invoiceDetailsList[i].id!).launch(context);
+
                         },
                         child: Card(
                           color: kBgColor,
@@ -105,7 +106,7 @@ class _InvoiceListState extends State<InvoiceList> {
                                 Row(
                                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                   children: [
-                                    Text("${request.invoiceDetailsList[i].amount!.toStringAsFixed(2)}",style: TextStyle(fontWeight: FontWeight.w700),),
+                                    Text("${request.invoiceDetailsList[i].amount}",style: TextStyle(fontWeight: FontWeight.w700),),
                                     Text("${request.invoiceDetailsList[i].invoiceDate}"),
                                   ],
                                 ),

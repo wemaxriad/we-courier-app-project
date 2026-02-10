@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer';
 import '/Models/invoice_detials_model.dart';
 import '/Models/payment_request_model.dart';
 import 'package:flutter/material.dart';
@@ -35,6 +36,7 @@ class InvoiceController extends GetxController {
 
   getInvoiceList({int page = 1}) {
     server.getRequest(endPoint: APIList.invoiceList!+"?page=${page}").then((response) {
+      log("Invoice List Response====================>>>>>>>>>>>>: ${response.body}");
       if (response != null && response.statusCode == 200) {
         loader = false;
         final jsonResponse = json.decode(response.body);
@@ -60,19 +62,36 @@ class InvoiceController extends GetxController {
     });
   }
 
+  Future<InvoiceDetailsModel?> getInvoiceDetails(int invoiceId) async {
+    final response = await server.getRequest(
+      endPoint: APIList.invoiceDetails! + "$invoiceId",
+    );
 
-  Future<InvoiceDetailsModel?> getInvoiceDetails(int invoiceId) async{
-
-    var response= await server.getRequest(endPoint: APIList.invoiceDetails!+"${invoiceId}");
-    if (response != null && response.statusCode == 200) {
+    if (response.statusCode == 200) {
       final jsonResponse = json.decode(response.body);
-      print(jsonResponse);
       return InvoiceDetailsModel.fromJson(jsonResponse["data"]);
     } else {
-      Get.showSnackbar(GetSnackBar(message: "Invoice Details Failed To Load",));
+      Get.showSnackbar(
+        const GetSnackBar(message: "Invoice Details Failed To Load"),
+      );
       return null;
     }
-
   }
+
+
+// Future<InvoiceDetailsModel?> getInvoiceDetails(int invoiceId) async{
+  //
+  //   var response= await server.getRequest(endPoint: APIList.invoiceDetails!+"${invoiceId}");
+  //
+  //   if (response) {
+  //
+  //     final jsonResponse = json.decode(response.body);
+  //     return InvoiceDetailsModel.fromJson(jsonResponse["data"]);
+  //   } else {
+  //     Get.showSnackbar(GetSnackBar(message: "Invoice Details Failed To Load",));
+  //     return null;
+  //   }
+  //
+  // }
 
 }

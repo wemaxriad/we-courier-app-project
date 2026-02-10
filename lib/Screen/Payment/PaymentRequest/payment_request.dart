@@ -76,73 +76,16 @@ class _PaymentReqState extends State<PaymentReq> {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.end,
-                                    children: [
-                                      PopupMenuButton(
-                                        icon: const Icon(
-                                          FeatherIcons.moreVertical,
-                                          size: 16.0,
-                                          color: kTitleColor,
-                                        ),
-                                        padding: EdgeInsets.zero,
-                                        itemBuilder: (BuildContext bc) => [
-                                          PopupMenuItem(
-                                            value: "/Code",
-                                            child: Column(
-                                              crossAxisAlignment: CrossAxisAlignment.start,
-                                              children: [
-                                                Row(
-                                                  children: [
-                                                    const Icon(FontAwesomeIcons.solidEye, color: kTitleColor, size: 14.0),
-                                                    const SizedBox(width: 5.0),
-                                                    Text(
-                                                      'View',
-                                                      style: kTextStyle.copyWith(color: kTitleColor),
-                                                    ),
-                                                  ],
-                                                ),
-                                                const SizedBox(height: 10.0),
-                                                Row(
-                                                  children: [
-                                                    const Icon(FontAwesomeIcons.solidPenToSquare, color: kTitleColor, size: 14.0),
-                                                    const SizedBox(width: 5.0),
-                                                    Text(
-                                                      'Edit',
-                                                      style: kTextStyle.copyWith(color: kTitleColor),
-                                                    ),
-                                                  ],
-                                                ),
-                                                const SizedBox(height: 10.0),
-                                                Row(
-                                                  children: [
-                                                     Icon(MdiIcons.delete, color: kTitleColor, size: 14.0),
-                                                    const SizedBox(width: 5.0),
-                                                    Text(
-                                                      'Delete',
-                                                      style: kTextStyle.copyWith(color: kTitleColor),
-                                                    ),
-                                                  ],
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                        ],
-                                        onSelected: (value) {
-                                          Navigator.pushNamed(context, '$value');
-                                        },
-                                      ),
-                                    ],
-                                  ),
+
                                   Row(
                                     children: [
                                       Text(
-                                        'Acc. details:',
+                                        'Payment Method:',
                                         style: kTextStyle.copyWith(color: kTitleColor, fontWeight: FontWeight.bold),
                                       ),
                                       const Spacer(),
                                       Text(
-                                        request.requestList[i].accountNo ?? '',
+                                        request.requestList[i].paymentMethodName ?? '',
                                         style: kTextStyle.copyWith(color: kGreyTextColor),
                                       ),
                                     ],

@@ -2,9 +2,9 @@ class InvoiceDetailsModel {
   int? id;
   String? invoiceId;
   String? status;
-  double? totalDeliverdAmount;
+  String? totalDeliverdAmount;
   String? deliveryCharge;
-  double? amount;
+  String? amount;
   String? codAmount;
   String? totalReturnFee;
   String? payableAmount;
@@ -13,7 +13,7 @@ class InvoiceDetailsModel {
   String? merchantPhone;
   String? merchantAddress;
   int? totalParcels;
-  Parcels? parcels;
+  List <Parcels>? parcels;
 
   InvoiceDetailsModel(
       {this.id,
@@ -36,10 +36,10 @@ class InvoiceDetailsModel {
     id = json['id'];
     invoiceId = json['invoice_id'];
     status = json['status'];
-    totalDeliverdAmount = json['total_deliverd_amount']!=null? json['total_deliverd_amount']*1.0:0;
+    totalDeliverdAmount = json['total_deliverd_amount']!=null? json['total_deliverd_amount']:'0';
     deliveryCharge = json['delivery_charge'].toString();
     codAmount = json['cod_amount'];
-    amount = json['amount']!=null? json['amount']*1.0:0;
+    amount = json['amount']!=null? json['amount']:'0';
     totalReturnFee = json['total_return_fee'].toString();
     payableAmount = json['payable_amount'].toString();
     invoiceDate = json['invoice_date'];
@@ -47,7 +47,12 @@ class InvoiceDetailsModel {
     merchantPhone = json['merchant_phone'];
     merchantAddress = json['merchant_address'];
     totalParcels = json['total_parcels'];
-    parcels = json['parcels'] != null ? new Parcels.fromJson(json['parcels']) : null;
+    if (json['parcels'] != null) {
+      parcels = <Parcels>[];
+      json['parcels'].forEach((v) {
+        parcels!.add(new Parcels.fromJson(v));
+      });
+    }
   }
 
   Map<String, dynamic> toJson() {
@@ -66,93 +71,17 @@ class InvoiceDetailsModel {
     data['merchant_phone'] = this.merchantPhone;
     data['merchant_address'] = this.merchantAddress;
     data['total_parcels'] = this.totalParcels;
+
+
     if (this.parcels != null) {
-      data['parcels'] = this.parcels!.toJson();
+      data['parcels'] = this.parcels!.map((v) => v.toJson()).toList();
     }
     return data;
   }
 }
+
 
 class Parcels {
-  int? currentPage;
-  List<Data>? data;
-  String? firstPageUrl;
-  int? from;
-  int? lastPage;
-  String? lastPageUrl;
-  List<Links>? links;
-  String? nextPageUrl;
-  String? path;
-  int? perPage;
-  Null? prevPageUrl;
-  int? to;
-  int? total;
-
-  Parcels(
-      {this.currentPage,
-        this.data,
-        this.firstPageUrl,
-        this.from,
-        this.lastPage,
-        this.lastPageUrl,
-        this.links,
-        this.nextPageUrl,
-        this.path,
-        this.perPage,
-        this.prevPageUrl,
-        this.to,
-        this.total});
-
-  Parcels.fromJson(Map<String, dynamic> json) {
-    currentPage = json['current_page'];
-    if (json['data'] != null) {
-      data = <Data>[];
-      json['data'].forEach((v) {
-        data!.add(new Data.fromJson(v));
-      });
-    }
-    firstPageUrl = json['first_page_url'];
-    from = json['from'];
-    lastPage = json['last_page'];
-    lastPageUrl = json['last_page_url'];
-    if (json['links'] != null) {
-      links = <Links>[];
-      json['links'].forEach((v) {
-        links!.add(new Links.fromJson(v));
-      });
-    }
-    nextPageUrl = json['next_page_url'];
-    path = json['path'];
-    perPage = json['per_page'];
-    prevPageUrl = json['prev_page_url'];
-    to = json['to'];
-    total = json['total'];
-  }
-
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['current_page'] = this.currentPage;
-    if (this.data != null) {
-      data['data'] = this.data!.map((v) => v.toJson()).toList();
-    }
-    data['first_page_url'] = this.firstPageUrl;
-    data['from'] = this.from;
-    data['last_page'] = this.lastPage;
-    data['last_page_url'] = this.lastPageUrl;
-    if (this.links != null) {
-      data['links'] = this.links!.map((v) => v.toJson()).toList();
-    }
-    data['next_page_url'] = this.nextPageUrl;
-    data['path'] = this.path;
-    data['per_page'] = this.perPage;
-    data['prev_page_url'] = this.prevPageUrl;
-    data['to'] = this.to;
-    data['total'] = this.total;
-    return data;
-  }
-}
-
-class Data {
   int? id;
   String? customerName;
   String? customerPhone;
@@ -165,7 +94,7 @@ class Data {
   String? totalDeliveryAmount;
   String? currentPayable;
 
-  Data(
+  Parcels(
       {this.id,
         this.customerName,
         this.customerPhone,
@@ -178,13 +107,13 @@ class Data {
         this.totalDeliveryAmount,
         this.currentPayable});
 
-  Data.fromJson(Map<String, dynamic> json) {
+  Parcels.fromJson(Map<String, dynamic> json) {
     id = json['id'];
     customerName = json['customer_name'];
     customerPhone = json['customer_phone'];
     invoiceNo = json['invoice_no'];
     trackingId = json['tracking_id'];
-    status = json['status'].toString();
+    status = json['statusName'].toString();
     cashCollection = json['cash_collection'];
     deliveryCharge = json['delivery_charge'];
     codAmount = json['cod_amount'];

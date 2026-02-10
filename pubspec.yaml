@@ -62,6 +62,7 @@ dependencies:
   #  address_search_field: ^5.0.3
   rainbow_color: ^2.0.1
   flutter_local_notifications: ^18.0.0
+  dotted_border: ^2.1.0
 
 dev_dependencies:
   flutter_test:

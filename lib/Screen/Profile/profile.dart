@@ -189,7 +189,7 @@ class _ProfileState extends State<Profile> {
                       color: Colors.deepOrangeAccent.shade200,
                     ),
                     onPressed: () {
-                      const BalanceDetails().launch(context);
+                       BalanceDetails().launch(context);
                     },
                   ),
 
