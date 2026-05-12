@@ -111,9 +111,9 @@ class _BalanceDetailsState extends State<BalanceDetails> {
                                 padding: EdgeInsets.symmetric(vertical: 9,horizontal: 7),
                                 decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(5),
-                                  border: Border.all(color: Colors.green,width: 2)
+                                  border: Border.all(color: kMainColor,width: 2)
                                 ),
-                                child: Text("Cleanable Parcels (${balanceController.balanceDetails.clearableParcels})",textAlign: TextAlign.center,style:TextStyle(fontSize: 18,color: Colors.green,fontWeight: FontWeight.w600,)),
+                                child: Text("Cleanable Parcels (${balanceController.balanceDetails.clearableParcels})",textAlign: TextAlign.center,style:TextStyle(fontSize: 18,color: kMainColor,fontWeight: FontWeight.w600,)),
                               ),
 
                             ),

@@ -30,4 +30,5 @@ class Images {
   static String get imageCustomer => 'assets/images/customer.png';
   static String get notification => "assets/images/notification.svg";
   static String get user => "assets/images/user.png";
+  static  String get truck => "assets/images/truck.png";
 }

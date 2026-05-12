@@ -1,44 +1,32 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
-import '../Parcel/create_parcel.dart';
-import '../Parcel/parcel_all_staus.dart';
-import '../Payment/AccTransaction/acc_transaction.dart';
-import '../Payment/PaymentRequest/invoice_list.dart';
-import '../Payment/PaymentRequest/payment_request.dart';
-import '../Payment/Statement/date_to_date_statement.dart';
-import '../Payment/balance_details.dart';
-import '../Payment/payment_acc.dart';
-import '../Profile/profile.dart';
-import '../Support/support.dart';
-import '../Widgets/button_global.dart';
-import '../Widgets/drawer.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:get/get.dart';
+import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
+import 'package:nb_utils/nb_utils.dart' hide redColor;
+import 'package:shimmer/shimmer.dart';
+
 import '/Controllers/dashboard_controller.dart';
 import '/Screen/Frauds/frauds.dart';
-import '/Screen/Home/home.dart';
 import '/Screen/Parcel/parcel_index.dart';
 import '/Screen/Shops/shops.dart';
-import '/Screen/delivery_charges.dart';
 import '/utils/image.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_feather_icons/flutter_feather_icons.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:get_storage/get_storage.dart';
-import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
-import 'package:nb_utils/nb_utils.dart';
-import 'package:shimmer/shimmer.dart';
-import 'package:get/get.dart';
-
 import '../../Controllers/global-controller.dart';
 import '../../Controllers/language_controller.dart';
+import '../../Models/dashboard_model.dart';
 import '../../Models/language_model.dart';
-import '../../utils/style.dart';
+import '../Parcel/create_parcel.dart';
+import '../Payment/PaymentRequest/invoice_list.dart';
+import '../Payment/balance_details.dart';
+import '../Profile/profile.dart';
+import '../Support/support.dart';
 import '../Widgets/constant.dart';
+import '../Widgets/drawer.dart';
 import '../Widgets/shimmer/dashboard_shimmer.dart';
-import '../cod_charges.dart';
+import 'widgets/dashboard_charts_section.dart';
 
 class DashBoard extends StatefulWidget {
   const DashBoard({Key? key}) : super(key: key);
@@ -52,1082 +40,811 @@ class _DashBoardState extends State<DashBoard> {
   DashboardController dashboard = Get.put(DashboardController());
   GlobalController globalController = Get.put(GlobalController());
 
-  final box = GetStorage();
   Language? selectedLang;
-  List<String> reportList = [
-    'total_parcel'.tr,
-    'total_delivered'.tr,
-    'total_return'.tr,
-    'total_transit'.tr,
-  ];
+  int _carouselPage = 0;
 
-  final iconList = <IconData>[
-    FontAwesomeIcons.boxOpen,
-    MdiIcons.truckFast,
-    FontAwesomeIcons.dna,
-    FontAwesomeIcons.dolly,
-  ];
-
-  List<Color> colorList = [
-    const Color(0xFFEFFBF8),
-    const Color(0xFFFDF9EE),
-    const Color(0xFFFBEBF1),
-    const Color(0xFFEFF5FA),
-  ];
-  List<String> imageList = [
+  final List<String> imageList = [
     Images.banner1,
     Images.banner2,
     Images.banner3,
   ];
 
-
-  @override
-  void initState() {
-    // FirebaseMessaging.instance.getInitialMessage().then((RemoteMessage? message) {});
-    //
-    // FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-    //   Get.rawSnackbar(
-    //     snackPosition: SnackPosition.TOP,
-    //     title: message.notification?.title,
-    //     message: message.notification?.body,
-    //     backgroundColor: kMainColor.withOpacity(.9),
-    //     maxWidth: ScreenSize(context).mainWidth / 1.007,
-    //     margin: const EdgeInsets.only(bottom: 20, left: 20, right: 20),
-    //   );
-    // });
-
-    // TODO: implement initState
-    super.initState();
-  }
-
-  final List<ServiceItem> services = [
-    ServiceItem("pickup_point".tr, "pick_drop", "assets/images/pick_drop.png"),
-    ServiceItem("create_order".tr, "pickup_request", "assets/images/pickup.png"),
-    ServiceItem("parcels".tr, "parcels", "assets/images/parcel.png"),
-    // ServiceItem("wallet".tr, "express_delivery", "assets/images/wallet.png"),
-    ServiceItem("payments".tr, "payments", "assets/images/payment.png"),
-    ServiceItem("support".tr, "support", "assets/images/support.png"),
-    ServiceItem("fraud".tr, "fraud", "assets/images/fraud.png"),
-
-  ];
-
   @override
   Widget build(BuildContext context) {
-    selectedLang = languageController.languageList[languageController.languageList.indexWhere((i) => i.locale == Get.locale)];
+    selectedLang = languageController.languageList[languageController.languageList
+        .indexWhere((i) => i.locale == Get.locale)];
 
     return Scaffold(
       backgroundColor: kBgColor,
-      drawer:DrawerView(),
+      drawer: DrawerView(),
       appBar: AppBar(
-        iconTheme: const IconThemeData(color: Colors.white),
-        titleSpacing: 0,
-        backgroundColor: kMainColor,
-        elevation: 0.0,
-        title: ListTile(
-          horizontalTitleGap: 0,
-          contentPadding: const EdgeInsets.all(10.0),
-          title: Text(
-            '${Get.find<GlobalController>().siteName }',
-            style: kTextStyle.copyWith(
-                color: Colors.white,
-                fontSize: 20.0,
-                fontWeight: FontWeight.bold),
+        backgroundColor: Colors.white,
+        surfaceTintColor: Colors.transparent,
+        elevation: 0,
+        shadowColor: kMainColor.withOpacity(0.06),
+        iconTheme: IconThemeData(color: kTitleColor),
+        leading: Builder(
+          builder: (ctx) => IconButton(
+            icon: Icon(Icons.menu_rounded, color: kTitleColor, size: 24.sp),
+            onPressed: () => Scaffold.of(ctx).openDrawer(),
           ),
         ),
+        titleSpacing: 8.w,
+        title: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              '${Get.find<GlobalController>().siteName}',
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                color: kMainColor,
+                fontSize: 17.sp,
+                fontWeight: FontWeight.w800,
+              ),
+            ),
+            SizedBox(height: 2.h),
+            Text(
+              '${'welcome'.tr}, ${Get.find<GlobalController>().userName}',
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                color: kGreyTextColor,
+                fontSize: 12.sp,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ],
+        ),
         actions: [
-          Padding(
-            padding: const EdgeInsets.only(right: 0),
-            child:  CircleAvatar(
-                radius:17.r,
-                backgroundColor: Colors.white,
-                child: PopupMenuButton(
-                  icon: Image.asset(
-                    selectedLang?.langName == 'English' ?Images.flagEn:selectedLang?.langName == 'Bangla' ? Images.flagBd:selectedLang?.langName == 'Spanish' ? Images.flagEs:Images.flagAr,
-                    fit: BoxFit.cover,
-                  ),
-                  onSelected: (newValue) {
-                    setState(() {
-                      selectedLang = newValue;
-                      if (newValue.langName == 'English') {
-                        languageController.changeLanguage("en");
-                      } else if (newValue.langName == 'Bangla') {
-                        languageController.changeLanguage("bn");
-                      } else if (newValue.langName == 'हिन्दी') {
-                        languageController.changeLanguage("hi");
-                      } else if (newValue.langName == 'عربي') {
-                        languageController.changeLanguage("ar");
-                      } else if (newValue.langName == 'Spanish') {
-                        languageController.changeLanguage("es");
-                      }
-                    });
-                  },
-                  itemBuilder: (BuildContext context) {
-                    return languageController.languageList.map((Language lang) {
-                      return PopupMenuItem<Language>(
-                        value: lang,
-                        child: Text(
-                          lang.langName,
-                          style: const TextStyle(
-                            fontSize: 15,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.black,
-                          ),
-                        ),
-                      );
-                    }).toList();
-                  },
-                )
+          _languageAction(),
+          SizedBox(width: 4.w),
+          _notificationAction(),
+          SizedBox(width: 4.w),
+          _profileAction(),
+          SizedBox(width: 10.w),
+        ],
+      ),
+      body: GetBuilder<DashboardController>(
+        builder: (dashboard) => dashboard.dashboardLoader
+            ? DashboardShimmer()
+            : SingleChildScrollView(
+                padding: EdgeInsets.fromLTRB(16.w, 12.h, 16.w, 24.h),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    if (dashboard.offersList.isNotEmpty) ...[
+                      _buildOfferCarousel(dashboard),
+                      SizedBox(height: 8.h),
+                      _carouselDots(dashboard),
+                      SizedBox(height: 16.h),
+                    ],
+                    _PayoutSummaryCard(d: dashboard.dashboardData),
+                    SizedBox(height: 20.h),
+                    Text(
+                      'quick_actions'.tr,
+                      style: TextStyle(
+                        color: kTitleColor,
+                        fontWeight: FontWeight.w800,
+                        fontSize: 16.sp,
+                      ),
+                    ),
+                    SizedBox(height: 12.h),
+                    _quickActionsGrid(),
+                    SizedBox(height: 20.h),
+
+                    Text(
+                      'merchant_dashboard'.tr,
+                      style: TextStyle(
+                        color: kTitleColor,
+                        fontWeight: FontWeight.w800,
+                        fontSize: 16.sp,
+                      ),
+                    ),
+                    SizedBox(height: 12.h),
+                    _parcelMetricsGrid(dashboard),
+                    SizedBox(height: 16.h),
+                    DashboardChartsSection(
+                      cod: dashboard.dashboardData.tCodAmount ?? 0,
+                      deliveryCharge: dashboard.dashboardData.tDeliveryCharge ?? 0,
+                      packing: dashboard.dashboardData.tPackaging ?? 0,
+                      liquidFragile: dashboard.dashboardData.tLiquidFragile ?? 0,
+                    ),
+                    SizedBox(height: 16.h),
+                    _financialSixGrid(dashboard),
+                    SizedBox(height: 12.h),
+                    _cashPaymentGrid(dashboard),
+                    SizedBox(height: 12.h),
+                    _wideStat(
+                      FontAwesomeIcons.boxesStacked,
+                      'total_parcel_bank_item'.tr,
+                      dashboard.dashboardData.tParcelBank.toString(),
+                    ),
+                    SizedBox(height: 8.h),
+                    _wideStat(
+                      FontAwesomeIcons.userSlash,
+                      'total_fraud_customer'.tr,
+                      dashboard.dashboardData.tFraud.toString(),
+                    ),
+                    SizedBox(height: 20.h),
+                    // Text(
+                    //   'quick_actions'.tr,
+                    //   style: TextStyle(
+                    //     color: kTitleColor,
+                    //     fontWeight: FontWeight.w800,
+                    //     fontSize: 16.sp,
+                    //   ),
+                    // ),
+                    // SizedBox(height: 12.h),
+                    // _quickActionsGrid(),
+                  ],
+                ),
+              ),
+      ),
+    );
+  }
+
+  Widget _languageAction() {
+    return CircleAvatar(
+      radius: 18.r,
+      backgroundColor: kAccentLight,
+      child: PopupMenuButton<Language>(
+        padding: EdgeInsets.zero,
+        child: Padding(
+          padding: EdgeInsets.all(6.r),
+          child: Image.asset(
+            selectedLang?.langName == 'English'
+                ? Images.flagEn
+                : selectedLang?.langName == 'Bangla'
+                    ? Images.flagBd
+                    : selectedLang?.langName == 'Spanish'
+                        ? Images.flagEs
+                        : Images.flagAr,
+            width: 22.w,
+            height: 16.h,
+            fit: BoxFit.cover,
+          ),
+        ),
+        onSelected: (newValue) {
+          setState(() {
+            selectedLang = newValue;
+            if (newValue.langName == 'English') {
+              languageController.changeLanguage('en');
+            } else if (newValue.langName == 'Bangla') {
+              languageController.changeLanguage('bn');
+            } else if (newValue.langName == 'हिन्दी') {
+              languageController.changeLanguage('hi');
+            } else if (newValue.langName == 'عربي') {
+              languageController.changeLanguage('ar');
+            } else if (newValue.langName == 'Spanish') {
+              languageController.changeLanguage('es');
+            }
+          });
+        },
+        itemBuilder: (BuildContext context) {
+          return languageController.languageList.map((Language lang) {
+            return PopupMenuItem<Language>(
+              value: lang,
+              child: Text(
+                lang.langName,
+                style: const TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.black,
+                ),
+              ),
+            );
+          }).toList();
+        },
+      ),
+    );
+  }
+
+  Widget _notificationAction() {
+    return IconButton(
+      onPressed: () {},
+      icon: Badge(
+        isLabelVisible: true,
+        label: Text('0', style: TextStyle(color: textWhiteColor, fontSize: 10.sp)),
+        child: CircleAvatar(
+          radius: 18.r,
+          backgroundColor: kAccentLight,
+          child: SvgPicture.asset(
+            Images.notification,
+            width: 18.w,
+            colorFilter: const ColorFilter.mode(kMainColor, BlendMode.srcIn),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _profileAction() {
+    return InkWell(
+      onTap: () => Get.to(() => Profile()),
+      borderRadius: BorderRadius.circular(40.r),
+      child: CircleAvatar(
+        radius: 18.r,
+        backgroundColor: kAccentLight,
+        child: ClipOval(
+          child: CachedNetworkImage(
+            imageUrl: Get.find<GlobalController>().userImage.toString(),
+            width: 36.w,
+            height: 36.w,
+            fit: BoxFit.cover,
+            placeholder: (context, url) => Shimmer.fromColors(
+              baseColor: Colors.grey[300]!,
+              highlightColor: Colors.grey[400]!,
+              child: const SizedBox.expand(),
+            ),
+            errorWidget: (context, url, error) => Image.asset(
+              Images.user,
+              fit: BoxFit.cover,
             ),
           ),
-          SizedBox(width: 5,),
-          Padding(
-            padding: const EdgeInsets.only(right: 0),
-            child: IconButton(
-              onPressed: () {
+        ),
+      ),
+    );
+  }
 
-              },
-              icon: Badge(
-                isLabelVisible:true,
-                label:  Text('0',style:  TextStyle(color: textWhiteColor)),
-                child:  CircleAvatar(
-                  radius:17.r,
-                  backgroundColor: Colors.white,
-                  child: SvgPicture.asset(
-                    Images.notification,
-                    width: 20.w,
-                    color: kMainColor,
+  int _carouselItemCount(DashboardController dashboard) {
+    return dashboard.offersList.isNotEmpty ? dashboard.offersList.length : imageList.length;
+  }
+
+  Widget _buildOfferCarousel(DashboardController dashboard) {
+    final count = _carouselItemCount(dashboard);
+    return CarouselSlider.builder(
+      options: CarouselOptions(
+        height: 190.h,
+        viewportFraction: 0.88,
+        enlargeCenterPage: true,
+        enlargeFactor: 0.12,
+        autoPlay: count > 1,
+        autoPlayInterval: const Duration(seconds: 4),
+        onPageChanged: (index, reason) {
+          setState(() => _carouselPage = index);
+        },
+      ),
+      itemCount: count,
+      itemBuilder: (context, index, realIndex) {
+        final child = dashboard.offersList.isNotEmpty
+            ? CachedNetworkImage(
+                imageUrl: dashboard.offersList[index].image.toString(),
+                fit: BoxFit.cover,
+                width: double.infinity,
+                placeholder: (context, url) => Shimmer.fromColors(
+                  baseColor: Colors.grey[300]!,
+                  highlightColor: Colors.grey[400]!,
+                  child: Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(16.r),
+                      color: Colors.white,
+                    ),
                   ),
                 ),
+                errorWidget: (context, url, error) => Image.asset(
+                  imageList[index % imageList.length],
+                  fit: BoxFit.cover,
+                  width: double.infinity,
+                ),
               )
-              ,
+            : Image.asset(
+                imageList[index % imageList.length],
+                fit: BoxFit.cover,
+                width: double.infinity,
+              );
+
+        return ClipRRect(
+          borderRadius: BorderRadius.circular(16.r),
+          child: Stack(
+            fit: StackFit.expand,
+            children: [
+              child,
+              Positioned(
+                left: 0,
+                right: 0,
+                bottom: 0,
+                height: 48.h,
+                child: DecoratedBox(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: [
+                        Colors.transparent,
+                        Colors.black.withOpacity(0.35),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _carouselDots(DashboardController dashboard) {
+    final n = _carouselItemCount(dashboard);
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: List.generate(
+        n,
+        (i) => AnimatedContainer(
+          duration: const Duration(milliseconds: 200),
+          margin: EdgeInsets.symmetric(horizontal: 4.w),
+          height: 7.h,
+          width: i == _carouselPage ? 18.w : 7.w,
+          decoration: BoxDecoration(
+            color: i == _carouselPage ? kMainColor : kGreyTextColor.withOpacity(0.28),
+            borderRadius: BorderRadius.circular(8.r),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _parcelMetricsGrid(DashboardController dashboard) {
+    final d = dashboard.dashboardData;
+    final transit = d.tParcel! - (d.tDelivered! + d.tReturn!);
+    final items = <_MetricSpec>[
+      _MetricSpec('total_parcel'.tr, d.tParcel.toString(), FontAwesomeIcons.boxOpen, kAccentLight, kMainColor),
+      _MetricSpec('total_delivered'.tr, d.tDelivered.toString(), FontAwesomeIcons.circleCheck, const Color(0xFFE8F8EF), green),
+      _MetricSpec('total_return'.tr, d.tReturn.toString(), FontAwesomeIcons.rotateLeft, const Color(0xFFFDEBE9), redColor),
+      _MetricSpec('total_transit'.tr, '$transit', MdiIcons.truckFast, const Color(0xFFFFF8E6), const Color(0xFFB8860B)),
+      _MetricSpec('total_shop'.tr, d.tShop.toString(), FontAwesomeIcons.store, kDashboardPurpleTint, kMainColor),
+      _MetricSpec('total_payment_request'.tr, d.tRequest.toString(), FontAwesomeIcons.fileInvoice, itembg, kMainColor),
+    ];
+
+    return GridView.count(
+      crossAxisCount: 3,
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      mainAxisSpacing: 10.h,
+      crossAxisSpacing: 10.w,
+      childAspectRatio: 0.92,
+      children: items.map((e) => _MetricTile(spec: e)).toList(),
+    );
+  }
+
+  Widget _financialSixGrid(DashboardController dashboard) {
+    final d = dashboard.dashboardData;
+    final c = Get.find<GlobalController>().currency!;
+    final netProfit =
+        (double.tryParse(d.tSale.toString()) ?? 0) - (double.tryParse(d.tDeliveryFee.toString()) ?? 0);
+
+    final items = <_MetricSpec>[
+      _MetricSpec('total_sales_amount'.tr, '$c ${d.tSale}', FontAwesomeIcons.chartColumn, kAccentLight, kMainColor),
+      _MetricSpec('total_delivery_fees_paid'.tr, '$c ${d.tDeliveryFee}', FontAwesomeIcons.truck, deleveryColor.withOpacity(0.35), kTitleColor),
+      _MetricSpec('net_profit_amount'.tr, '$c ${netProfit.toStringAsFixed(2)}', FontAwesomeIcons.chartLine, const Color(0xFFFCE4EC), kSecondaryColor),
+      _MetricSpec('current_balance'.tr, '$c ${d.merchant!.currentBalance}', FontAwesomeIcons.wallet, const Color(0xFFE8F8EF), green),
+      _MetricSpec('opening_balance'.tr, '$c ${d.merchant!.openingBalance}', FontAwesomeIcons.buildingColumns, const Color(0xFFFFF8E6), const Color(0xFFB8860B)),
+      _MetricSpec('vat'.tr, '$c ${d.merchant!.vat}', FontAwesomeIcons.percent, itembg, kMainColor),
+    ];
+
+    return GridView.count(
+      crossAxisCount: 3,
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      mainAxisSpacing: 10.h,
+      crossAxisSpacing: 10.w,
+      childAspectRatio: 0.88,
+      children: items.map((e) => _MetricTile(spec: e, compactValue: true)).toList(),
+    );
+  }
+
+  Widget _cashPaymentGrid(DashboardController dashboard) {
+    final d = dashboard.dashboardData;
+    final c = Get.find<GlobalController>().currency!;
+    final items = <_MetricSpec>[
+      _MetricSpec('total_cash_collection'.tr, '$c ${d.tCashCollection}', FontAwesomeIcons.moneyBill1, const Color(0xFFE8F8EF), green),
+      _MetricSpec('total_selling_price'.tr, '$c ${d.tSellingPrice}', FontAwesomeIcons.tag, const Color(0xFFFCE4EC), kSecondaryColor),
+      _MetricSpec('payment_processing'.tr, '$c ${d.tBalanceProc}', FontAwesomeIcons.creditCard, deleveryColor.withOpacity(0.45), kTitleColor),
+      _MetricSpec('paid_amount'.tr, '$c ${d.tBalancePaid}', FontAwesomeIcons.circleCheck, kAccentLight, kMainColor),
+    ];
+
+    return GridView.count(
+      crossAxisCount: 2,
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      mainAxisSpacing: 10.h,
+      crossAxisSpacing: 10.w,
+      childAspectRatio: 1.35,
+      children: items.map((e) => _MetricTile(spec: e, compactValue: true)).toList(),
+    );
+  }
+
+  Widget _wideStat(IconData icon, String label, String value) {
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 12.h),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(14.r),
+        border: Border.all(color: kAccentLine.withOpacity(0.6)),
+        boxShadow: [
+          BoxShadow(
+            color: kMainColor.withOpacity(0.04),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          Icon(icon, color: kMainColor, size: 20.sp),
+          SizedBox(width: 12.w),
+          Expanded(
+            child: Text(
+              label,
+              style: TextStyle(
+                fontSize: 13.sp,
+                fontWeight: FontWeight.w600,
+                color: kTitleColor,
+              ),
             ),
           ),
-          InkWell(
-            onTap: () {
-              Get.to(()=>Profile());
-            },
-            child: Padding(
-              padding: const EdgeInsets.only(left: 5,right: 10,top: 10,bottom: 10),
-              child: Container(
-                  height: 40.h,
-                  width: 32.w,
-                  decoration: BoxDecoration(
-                      color: kBgColor,
-                      borderRadius: BorderRadius.circular(50)),
-                  child: CachedNetworkImage(
-                      imageUrl: Get.find<GlobalController>().userImage.toString(),
-                      imageBuilder: (context, imageProvider) => Container(
-                          height: 40.h,
-                          width: 32.w,
-                          decoration: BoxDecoration(
-                            color: kBgColor,
-                            borderRadius: BorderRadius.circular(50),
-                            image: DecorationImage(
-                                image: imageProvider, fit: BoxFit.fill),
-                          )),
-                      placeholder: (context, url) => Shimmer.fromColors(
-                        baseColor: Colors.grey[300]!,
-                        highlightColor: Colors.grey[400]!,
-                        child: const CircleAvatar(radius: 40.0),
-                      ),
-                      errorWidget: (context, url, error) => Container(
-                          height: 40.h,
-                          width: 32.w,
-                          decoration: BoxDecoration(
-                            color: kBgColor,
-                            borderRadius: BorderRadius.circular(50),
-                            image: DecorationImage(
-                              image: AssetImage(
-                                Images.user,
-                              ),
-                              fit: BoxFit.cover,
-                            ),
-                          )))),
+          Text(
+            value,
+            style: TextStyle(
+              fontSize: 15.sp,
+              fontWeight: FontWeight.w800,
+              color: kMainColor,
             ),
           ),
         ],
       ),
+    );
+  }
 
-      body:  GetBuilder<DashboardController>(
-          builder: (dashboard) =>
-              SingleChildScrollView(
-                  child:dashboard.dashboardLoader
-                      ? DashboardShimmer()
-                      :
-                  Column(
+  Widget _quickActionsGrid() {
+    final actions = <ServiceItem>[
+      ServiceItem('check_balance'.tr, 'check_balance', iconData: Icons.account_balance_wallet_rounded),
+      ServiceItem('parcel_planner'.tr, 'parcel_planner', iconData: FontAwesomeIcons.calendarWeek),
+      ServiceItem('pickup_point'.tr, 'pick_drop', iconPath: 'assets/images/pick_drop.png'),
+      ServiceItem('create_order'.tr, 'pickup_request', iconPath: 'assets/images/pickup.png'),
+      ServiceItem('parcels'.tr, 'parcels', iconPath: 'assets/images/parcel.png'),
+      ServiceItem('payments'.tr, 'payments', iconPath: 'assets/images/payment.png'),
+      ServiceItem('support'.tr, 'support', iconPath: 'assets/images/support.png'),
+      ServiceItem('fraud'.tr, 'fraud', iconPath: 'assets/images/fraud.png'),
+    ];
+
+    return GridView.builder(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 4,
+        mainAxisSpacing: 10.h,
+        crossAxisSpacing: 10.w,
+        childAspectRatio: 0.78,
+      ),
+      itemCount: actions.length,
+      itemBuilder: (context, index) => ServiceCard(service: actions[index]),
+    );
+  }
+}
+
+class _MetricSpec {
+  _MetricSpec(this.label, this.value, this.icon, this.bg, this.iconColor);
+  final String label;
+  final String value;
+  final IconData icon;
+  final Color bg;
+  final Color iconColor;
+}
+
+class _MetricTile extends StatelessWidget {
+  const _MetricTile({required this.spec, this.compactValue = false});
+  final _MetricSpec spec;
+  final bool compactValue;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: EdgeInsets.all(10.w),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(14.r),
+        border: Border.all(color: kAccentLine.withOpacity(0.5)),
+        boxShadow: [
+          BoxShadow(
+            color: kMainColor.withOpacity(0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 3),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            padding: EdgeInsets.all(8.r),
+            decoration: BoxDecoration(
+              color: spec.bg,
+              borderRadius: BorderRadius.circular(10.r),
+            ),
+            child: Icon(spec.icon, size: 18.sp, color: spec.iconColor),
+          ),
+          const Spacer(),
+          Text(
+            spec.label,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(
+              fontSize: 10.sp,
+              fontWeight: FontWeight.w600,
+              color: kGreyTextColor,
+              height: 1.2,
+            ),
+          ),
+          SizedBox(height: 4.h),
+          Text(
+            spec.value,
+            maxLines: compactValue ? 2 : 1,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(
+              fontSize: compactValue ? 11.sp : 13.sp,
+              fontWeight: FontWeight.w800,
+              color: kTitleColor,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _PayoutSummaryCard extends StatelessWidget {
+  const _PayoutSummaryCard({required this.d});
+  final DataDashboard d;
+
+  @override
+  Widget build(BuildContext context) {
+    final c = Get.find<GlobalController>().currency!;
+    return Container(
+      width: double.infinity,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(18.r),
+        border: Border.all(color: kAccentLine.withOpacity(0.7)),
+        boxShadow: [
+          BoxShadow(
+            color: kMainColor.withOpacity(0.07),
+            blurRadius: 14,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(
+        children: [
+          Container(
+            height: 4.h,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.vertical(top: Radius.circular(18.r)),
+              gradient: const LinearGradient(
+                colors: kPrimaryGradientColors,
+              ),
+            ),
+          ),
+          Padding(
+            padding: EdgeInsets.fromLTRB(14.w, 12.h, 14.w, 14.h),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+
+                /// LEFT SIDE
+                Expanded(
+                  child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Container(
-                        width: double.infinity,
-                        decoration: BoxDecoration(
-                          color: kMainColor, // Background color
-                          borderRadius: BorderRadius.only(
-                            bottomLeft: Radius.circular(25.r),  // Bottom-left radius
-                            bottomRight: Radius.circular(25.r), // Bottom-right radius
+
+                      Text(
+                        'total_current_payable_amount'.tr,
+                        style: TextStyle(
+                          fontSize: 11.sp,
+                          color: kGreyTextColor,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+
+                      SizedBox(height: 4.h),
+
+                      FittedBox(
+                        fit: BoxFit.scaleDown,
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          '$c ${d.tCurrentPayable}',
+                          style: TextStyle(
+                            fontSize: 20.sp,
+                            fontWeight: FontWeight.w800,
+                            color: kMainColor,
                           ),
                         ),
-                        child: Padding(
-                          padding:  EdgeInsets.only(left: 20.r,right: 20.r,bottom: 20.r),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    'welcome'.tr,
-                                    style: TextStyle(
-                                      fontSize: 17.r,
-                                      fontWeight: FontWeight.w400,
-                                      color: textWhiteColor,
-                                    ),
-                                  ),
-                                  Text(
-                                    '${ Get.find<GlobalController>().userName.toString()}',
-                                    style: TextStyle(
-                                      fontSize: 16.r,
-                                      fontWeight: FontWeight.bold,
-                                      color: textWhiteColor,
-                                    ),
+                      ),
+
+                      SizedBox(height: 10.h),
+
+                      Text(
+                        'total_delivery_amount'.tr,
+                        style: TextStyle(
+                          fontSize: 11.sp,
+                          color: kGreyTextColor,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+
+                      SizedBox(height: 2.h),
+
+                      Text(
+                        '$c ${d.tDeliveryAmount}',
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          fontSize: 14.sp,
+                          fontWeight: FontWeight.w700,
+                          color: kTitleColor,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+
+                SizedBox(width: 8.w),
+
+                /// RIGHT SIDE FIXED WIDTH
+                SizedBox(
+                  width: 130.w,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+
+                      /// TRUCK IMAGE
+                      SizedBox(
+                        width: 125.w,
+                        height: 68.h,
+                        child: Image.asset(
+                          'assets/images/truck.png',
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+
+                      SizedBox(height: 6.h),
+
+                      /// PAYOUT BUTTON
+                      SizedBox(
+                        width: 120.w,
+                        child: Material(
+                          color: Colors.transparent,
+                          child: InkWell(
+                            onTap: () {},
+                            borderRadius: BorderRadius.circular(30.r),
+                            child: Ink(
+                              decoration: BoxDecoration(
+                                gradient: const LinearGradient(
+                                  colors: kPrimaryGradientColors,
+                                ),
+                                borderRadius: BorderRadius.circular(30.r),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: kMainColor.withOpacity(0.18),
+                                    blurRadius: 10,
+                                    offset: const Offset(0, 4),
                                   ),
                                 ],
                               ),
-                              SizedBox(height: 10.h,),
-                              InkWell(
-                                onTap: (){
-                                  const BalanceDetails().launch(context);
-                                },
-                                child: Container(
-                                  padding: EdgeInsets.all(16.w),
-                                  decoration: BoxDecoration(
-                                    color: kBgColor,
-                                    borderRadius: BorderRadius.circular(12.r),
-                                  ),
-                                  child: Row(
-                                    children: [
-                                      Icon(Icons.account_balance_wallet, size: 30.w, color:kMainColor),
-                                      SizedBox(width: 10.w),
-                                      Text('check_balance'.tr, style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.bold)),
-                                      Spacer(),
-                                      Icon(Icons.arrow_forward_ios, size: 18.w, color: Colors.grey),
-                                    ],
+                              child: Padding(
+                                padding: EdgeInsets.symmetric(
+                                  vertical: 10.h,
+                                ),
+                                child: Center(
+                                  child: Text(
+                                    'request_payout'.tr,
+                                    style: TextStyle(
+                                      color: textWhiteColor,
+                                      fontWeight: FontWeight.w700,
+                                      fontSize: 10.sp,
+                                    ),
                                   ),
                                 ),
                               ),
-                            ],
+                            ),
                           ),
                         ),
                       ),
-                      // Track your package section
-                      Padding(
-                        padding:  EdgeInsets.only(top: 0,left: 15.r,bottom: 15.r,right: 15.r),
-                        child:
-                        Column(
-                          children: [
-                            CarouselSlider.builder(
-                              options: CarouselOptions(
-                                height: 200,
-                                aspectRatio: 16 / 9,
-                                viewportFraction: 0.8,
-                                initialPage: 0,
-                                enableInfiniteScroll: true,
-                                reverse: false,
-                                autoPlay: true,
-                                autoPlayInterval: const Duration(seconds: 3),
-                                autoPlayAnimationDuration:
-                                const Duration(milliseconds: 800),
-                                autoPlayCurve: Curves.fastOutSlowIn,
-                                enlargeCenterPage: true,
-                                onPageChanged: null,
-                                scrollDirection: Axis.horizontal,
-                              ),
-                              // itemCount: imageList.length,
-                              itemCount:  dashboard.offersList.isNotEmpty?dashboard.offersList.length:imageList.length,
-                              itemBuilder:
-                                  (BuildContext context, int index, int realIndex) {
-                                return dashboard.offersList.isNotEmpty?
-                                CachedNetworkImage(
-                                  imageUrl:dashboard.offersList[index].image.toString(),
-                                  imageBuilder: (context, imageProvider) =>
-                                      Container(
-                                          height: 180,
-                                          decoration: BoxDecoration(
-                                            image: DecorationImage(
-                                                image:imageProvider
-                                            ),
-                                          )),
-                                  placeholder: (context, url) => Shimmer.fromColors(
-                                    child: Container(
-                                      height: 180,
-                                      decoration: BoxDecoration(
-                                        image: DecorationImage(
-                                          image: AssetImage(
-                                            imageList[index],
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                    baseColor: Colors.grey[300]!,
-                                    highlightColor: Colors.grey[400]!,
-                                  ),
-                                  errorWidget: (context, url, error) =>
-                                      Container(
-                                        height: 180,
-                                        decoration: BoxDecoration(
-                                          image: DecorationImage(
-                                            image: AssetImage(
-                                              imageList[index],
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                )
-                                    :Container(
-                                  height: 180,
-                                  decoration: BoxDecoration(
-                                    image: DecorationImage(
-                                      image: AssetImage(
-                                        imageList[index],
-                                      ),
-                                    ),
-                                  ),
-                                );
-                              },
-                            ),
-                            const SizedBox(height: 5),
-                            GridView.builder(
-                              shrinkWrap: true,
-                              physics: NeverScrollableScrollPhysics(),
-                              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                                crossAxisCount: 3,
-                                childAspectRatio: 0.95,
-                                crossAxisSpacing: 9.w,
-                                mainAxisSpacing: 15.h,
-                              ),
-                              itemCount: services.length,
-                              itemBuilder: (context, index) {
-                                return ServiceCard(service: services[index]);
-                              },
-                            ),
-                            const SizedBox(height: 10),
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-
-                                Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: Text(
-                                    'merchant_dashboard'.tr,
-                                    style: kTextStyle.copyWith(
-                                        color: kTitleColor,
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 18.0),
-                                  ),
-                                ),
-                                const SizedBox(height: 10),
-                                GridView.count(
-                                  crossAxisCount: 2,
-                                  crossAxisSpacing: 10.0,
-                                  childAspectRatio: 1,
-                                  mainAxisSpacing: 10.0,
-                                  shrinkWrap: true,
-                                  physics: const NeverScrollableScrollPhysics(),
-                                  children: List.generate(
-                                    4,
-                                        (i) {
-                                      return
-                                        Card(
-                                          color: colorList[i],
-                                          elevation: 10,
-                                          shadowColor: kMainColor,
-                                          shape: RoundedRectangleBorder(
-                                            borderRadius: BorderRadius.circular(10.0),
-                                          ),
-                                          child: Padding(
-                                            padding: const EdgeInsets.all(10.0),
-                                            child: Column(
-                                              crossAxisAlignment: CrossAxisAlignment.center,
-                                              children: [
-                                                const SizedBox(height: 20),
-                                                Icon(
-                                                  iconList[i],
-                                                  size: 40,
-                                                  color: kTitleColor,
-                                                ),
-                                                const SizedBox(height: 10.0),
-                                                Text(
-                                                  reportList[i],
-                                                  style: kTextStyle.copyWith(
-                                                      color: kTitleColor,
-                                                      fontWeight: FontWeight.bold),
-                                                ),
-                                                const SizedBox(height: 10.0),
-                                                Text(
-                                                  i == 0? dashboard.dashboardData.tParcel.toString(): i==1?dashboard.dashboardData.tDelivered.toString():i==2?dashboard.dashboardData.tReturn.toString():i==3? "${dashboard.dashboardData.tParcel! - (dashboard.dashboardData.tDelivered! + dashboard.dashboardData.tReturn!)}" :'0',
-                                                  style: kTextStyle.copyWith(
-                                                      color: kTitleColor,
-                                                      fontSize: 20.0,
-                                                      fontWeight: FontWeight.bold),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                        );
-                                    },
-                                  ),
-                                ),
-                                const SizedBox(height: 20),
-                                Card(
-                                  elevation: 10,
-                                  child: Container(
-                                    padding: const EdgeInsets.all(10.0),
-                                    decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(5.0),
-                                        color: Colors.white),
-                                    child: Column(
-                                      children: [
-                                        Container(
-                                          padding: const EdgeInsets.all(10.0),
-                                          decoration: BoxDecoration(
-                                            color: Colors.white,
-                                            border: Border.all(
-                                              color: kGreyTextColor.withOpacity(0.2),
-                                            ),
-                                          ),
-                                          child: Column(
-                                            children: [
-                                              Row(
-                                                children: [
-                                                  Text(
-                                                    'total_cash_collection'.tr,
-                                                    style: kTextStyle.copyWith(
-                                                        color: kTitleColor),
-                                                  ),
-                                                  const Spacer(),
-                                                  Text(
-                                                    '${Get.find<GlobalController>()
-                                                        .currency!} ${dashboard.dashboardData.tCashCollection.toString()}',
-                                                    style: kTextStyle.copyWith(
-                                                        color: kTitleColor),
-                                                  ),
-                                                ],
-                                              ),
-                                              Row(
-                                                children: [
-                                                  Text(
-                                                    'total_selling_price'.tr,
-                                                    style: kTextStyle.copyWith(
-                                                        color: kTitleColor),
-                                                  ),
-                                                  const Spacer(),
-                                                  Text(
-                                                    '${Get.find<GlobalController>()
-                                                        .currency!} ${dashboard.dashboardData.tSellingPrice.toString()}',
-                                                    style: kTextStyle.copyWith(
-                                                        color: kTitleColor),
-                                                  ),
-                                                ],
-                                              ),
-                                              Row(
-                                                children: [
-                                                  Text(
-                                                    'net_profit_amount'.tr,
-                                                    style: kTextStyle.copyWith(
-                                                        color: kTitleColor),
-                                                  ),
-                                                  const Spacer(),
-                                                  Text(
-                                                    "${Get.find<GlobalController>()
-                                                        .currency!} ${(dashboard.dashboardData.tCashCollection! - dashboard.dashboardData.tSellingPrice!).toStringAsFixed(2)}",
-                                                    style: kTextStyle.copyWith(
-                                                        color: kTitleColor),
-                                                  ),
-                                                ],
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                        Container(
-                                          padding: const EdgeInsets.all(10.0),
-                                          decoration: BoxDecoration(
-                                            color: Colors.white,
-                                            border: Border.all(
-                                              color: kGreyTextColor.withOpacity(0.2),
-                                            ),
-                                          ),
-                                          child: Column(
-                                            children: [
-                                              Row(
-                                                children: [
-                                                  Text(
-                                                    'total_liquid_fragile_amount'.tr,
-                                                    style: kTextStyle.copyWith(
-                                                        color: kTitleColor),
-                                                  ),
-                                                  const Spacer(),
-                                                  Text(
-                                                    "${Get.find<GlobalController>()
-                                                        .currency!} ${dashboard.dashboardData.tLiquidFragile.toString()}",
-                                                    style: kTextStyle.copyWith(
-                                                        color: kTitleColor),
-                                                  ),
-                                                ],
-                                              ),
-                                              Row(
-                                                children: [
-                                                  Text(
-                                                    'total_packing_amount'.tr,
-                                                    style: kTextStyle.copyWith(
-                                                        color: kTitleColor),
-                                                  ),
-                                                  const Spacer(),
-                                                  Text(
-                                                    "${Get.find<GlobalController>()
-                                                        .currency!} ${dashboard.dashboardData.tPackaging.toString()}",
-                                                    style: kTextStyle.copyWith(
-                                                        color: kTitleColor),
-                                                  ),
-                                                ],
-                                              ),
-                                              Row(
-                                                children: [
-                                                  Text(
-                                                    'total_vat_amount'.tr,
-                                                    style: kTextStyle.copyWith(
-                                                        color: kTitleColor),
-                                                  ),
-                                                  const Spacer(),
-                                                  Text(
-                                                    '${Get.find<GlobalController>()
-                                                        .currency!} ${dashboard.dashboardData.tVatAmount.toString()}',
-                                                    style: kTextStyle.copyWith(
-                                                        color: kTitleColor),
-                                                  ),
-                                                ],
-                                              ),
-                                              Row(
-                                                children: [
-                                                  Text(
-                                                    'total_delivery_charge'.tr,
-                                                    style: kTextStyle.copyWith(
-                                                        color: kTitleColor),
-                                                  ),
-                                                  const Spacer(),
-                                                  Text(
-                                                    '${Get.find<GlobalController>()
-                                                        .currency!} ${dashboard.dashboardData.tDeliveryCharge.toString()}',
-                                                    style: kTextStyle.copyWith(
-                                                        color: kTitleColor),
-                                                  ),
-                                                ],
-                                              ),
-                                              Row(
-                                                children: [
-                                                  Text(
-                                                    'total_cod_amount'.tr,
-                                                    style: kTextStyle.copyWith(
-                                                        color: kTitleColor),
-                                                  ),
-                                                  const Spacer(),
-                                                  Text(
-                                                    '${Get.find<GlobalController>()
-                                                        .currency!} ${dashboard.dashboardData.tCodAmount.toString()}',
-                                                    style: kTextStyle.copyWith(
-                                                        color: kTitleColor),
-                                                  ),
-                                                ],
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                        Container(
-                                          padding: const EdgeInsets.all(10.0),
-                                          decoration: BoxDecoration(
-                                            color: Colors.white,
-                                            border: Border.all(
-                                              color: kGreyTextColor.withOpacity(0.2),
-                                            ),
-                                          ),
-                                          child: Column(
-                                            children: [
-                                              Row(
-                                                children: [
-                                                  Text(
-                                                    'total_delivery_amount'.tr,
-                                                    style: kTextStyle.copyWith(
-                                                        color: kTitleColor),
-                                                  ),
-                                                  const Spacer(),
-                                                  Text(
-                                                    '${Get.find<GlobalController>()
-                                                        .currency!} ${dashboard.dashboardData.tDeliveryAmount.toString()}',
-                                                    style: kTextStyle.copyWith(
-                                                        color: kTitleColor),
-                                                  ),
-                                                ],
-                                              ),
-                                              Row(
-                                                children: [
-                                                  Text(
-                                                    'total_current_payable_amount'.tr,
-                                                    style: kTextStyle.copyWith(
-                                                        color: kTitleColor),
-                                                  ),
-                                                  const Spacer(),
-                                                  Text(
-                                                    '${Get.find<GlobalController>()
-                                                        .currency!} ${dashboard.dashboardData.tCurrentPayable.toString()}',
-                                                    style: kTextStyle.copyWith(
-                                                        color: kTitleColor),
-                                                  ),
-                                                ],
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                                const SizedBox(height: 20),
-                                Text(
-                                  'all_reports'.tr,
-                                  style: kTextStyle.copyWith(
-                                      color: kGreyTextColor,
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 18.0),
-                                ),
-                                Card(
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(10.0),
-                                    child: ListTile(
-                                      contentPadding: EdgeInsets.zero,
-                                      leading: const Icon(
-                                        FontAwesomeIcons.handHoldingDollar,
-                                        color: kTitleColor,
-                                      ),
-                                      trailing: Column(
-                                        crossAxisAlignment: CrossAxisAlignment.end,
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          Text(
-                                            'total_sales_amount'.tr,
-                                            style: kTextStyle.copyWith(color: kTitleColor),
-                                          ),
-                                          const SizedBox(height: 5.0),
-                                          Text(
-                                            '${Get.find<GlobalController>()
-                                                .currency!} ${dashboard.dashboardData.tSale.toString()}',
-                                            style: kTextStyle.copyWith(
-                                                color: kTitleColor,
-                                                fontWeight: FontWeight.bold),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                                Card(
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(10.0),
-                                    child: ListTile(
-                                      contentPadding: EdgeInsets.zero,
-                                      leading: const Icon(
-                                        FontAwesomeIcons.handshakeAngle,
-                                        color: kTitleColor,
-                                      ),
-                                      trailing: Column(
-                                        crossAxisAlignment: CrossAxisAlignment.end,
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          Text(
-                                            'total_delivery_fees_paid'.tr,
-                                            style: kTextStyle.copyWith(color: kTitleColor),
-                                          ),
-                                          const SizedBox(height: 5.0),
-                                          Text(
-                                            '${Get.find<GlobalController>()
-                                                .currency!} ${dashboard.dashboardData.tDeliveryFee.toString()}',
-                                            style: kTextStyle.copyWith(
-                                                color: kTitleColor,
-                                                fontWeight: FontWeight.bold),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                                Card(
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(10.0),
-                                    child: ListTile(
-                                      contentPadding: EdgeInsets.zero,
-                                      leading: const Icon(
-                                        FontAwesomeIcons.coins,
-                                        color: kTitleColor,
-                                      ),
-                                      trailing: Column(
-                                        crossAxisAlignment: CrossAxisAlignment.end,
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          Text(
-                                            'net_profit_amount'.tr,
-                                            style: kTextStyle.copyWith(color: kTitleColor),
-                                          ),
-                                          const SizedBox(height: 5.0),
-                                          Text(
-                                            "${Get.find<GlobalController>()
-                                                .currency!} ${double.parse(dashboard.dashboardData.tSale.toString()) - double.parse(dashboard.dashboardData.tDeliveryFee.toString())}",
-                                            style: kTextStyle.copyWith(
-                                                color: kTitleColor,
-                                                fontWeight: FontWeight.bold),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                                Card(
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(10.0),
-                                    child: ListTile(
-                                      contentPadding: EdgeInsets.zero,
-                                      leading: const Icon(
-                                        FontAwesomeIcons.creditCard,
-                                        color: kTitleColor,
-                                      ),
-                                      trailing: Column(
-                                        crossAxisAlignment: CrossAxisAlignment.end,
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          Text(
-                                            'current_balance'.tr,
-                                            style: kTextStyle.copyWith(color: kTitleColor),
-                                          ),
-                                          const SizedBox(height: 5.0),
-                                          Text(
-                                            '${Get.find<GlobalController>()
-                                                .currency!} ${dashboard.dashboardData.merchant!.currentBalance.toString()}',
-                                            style: kTextStyle.copyWith(
-                                                color: kTitleColor,
-                                                fontWeight: FontWeight.bold),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                                Card(
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(10.0),
-                                    child: ListTile(
-                                      contentPadding: EdgeInsets.zero,
-                                      leading: const Icon(
-                                        FontAwesomeIcons.circleDollarToSlot,
-                                        color: kTitleColor,
-                                      ),
-                                      trailing: Column(
-                                        crossAxisAlignment: CrossAxisAlignment.end,
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          Text(
-                                            'opening_balance'.tr,
-                                            style: kTextStyle.copyWith(color: kTitleColor),
-                                          ),
-                                          const SizedBox(height: 5.0),
-                                          Text(
-                                            '${Get.find<GlobalController>()
-                                                .currency!} ${dashboard.dashboardData.merchant!.openingBalance.toString()}',
-                                            style: kTextStyle.copyWith(
-                                                color: kTitleColor,
-                                                fontWeight: FontWeight.bold),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                                Card(
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(10.0),
-                                    child: ListTile(
-                                      contentPadding: EdgeInsets.zero,
-                                      leading: const Icon(
-                                        FontAwesomeIcons.dna,
-                                        color: kTitleColor,
-                                      ),
-                                      trailing: Column(
-                                        crossAxisAlignment: CrossAxisAlignment.end,
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          Text(
-                                            'vat'.tr,
-                                            style: kTextStyle.copyWith(color: kTitleColor),
-                                          ),
-                                          const SizedBox(height: 5.0),
-                                          Text(
-                                            '${Get.find<GlobalController>()
-                                                .currency!} ${dashboard.dashboardData.merchant!.vat.toString()}',
-                                            style: kTextStyle.copyWith(
-                                                color: kTitleColor,
-                                                fontWeight: FontWeight.bold),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                                Card(
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(10.0),
-                                    child: ListTile(
-                                      contentPadding: EdgeInsets.zero,
-                                      leading: const Icon(
-                                        FontAwesomeIcons.hourglass,
-                                        color: kTitleColor,
-                                      ),
-                                      trailing: Column(
-                                        crossAxisAlignment: CrossAxisAlignment.end,
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          Text(
-                                            'payment_processing'.tr,
-                                            style: kTextStyle.copyWith(color: kTitleColor),
-                                          ),
-                                          const SizedBox(height: 5.0),
-                                          Text(
-                                            '${Get.find<GlobalController>()
-                                                .currency!} ${dashboard.dashboardData.tBalanceProc.toString()}',
-                                            style: kTextStyle.copyWith(
-                                                color: kTitleColor,
-                                                fontWeight: FontWeight.bold),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                                Card(
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(10.0),
-                                    child: ListTile(
-                                      contentPadding: EdgeInsets.zero,
-                                      leading: const Icon(
-                                        FontAwesomeIcons.database,
-                                        color: kTitleColor,
-                                      ),
-                                      trailing: Column(
-                                        crossAxisAlignment: CrossAxisAlignment.end,
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          Text(
-                                            'paid_amount'.tr,
-                                            style: kTextStyle.copyWith(color: kTitleColor),
-                                          ),
-                                          const SizedBox(height: 5.0),
-                                          Text(
-                                            '${Get.find<GlobalController>()
-                                                .currency!} ${dashboard.dashboardData.tBalancePaid.toString()}',
-                                            style: kTextStyle.copyWith(
-                                                color: kTitleColor,
-                                                fontWeight: FontWeight.bold),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                                Card(
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(10.0),
-                                    child: ListTile(
-                                      contentPadding: EdgeInsets.zero,
-                                      leading: const Icon(
-                                        FontAwesomeIcons.houseChimney,
-                                        color: kTitleColor,
-                                      ),
-                                      trailing: Column(
-                                        crossAxisAlignment: CrossAxisAlignment.end,
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          Text(
-                                            'total_shop'.tr,
-                                            style: kTextStyle.copyWith(color: kTitleColor),
-                                          ),
-                                          const SizedBox(height: 5.0),
-                                          Text(
-                                            '${dashboard.dashboardData.tShop.toString()}',
-                                            style: kTextStyle.copyWith(
-                                                color: kTitleColor,
-                                                fontWeight: FontWeight.bold),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                                Card(
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(10.0),
-                                    child: ListTile(
-                                      contentPadding: EdgeInsets.zero,
-                                      leading: const Icon(
-                                        FontAwesomeIcons.boxesStacked,
-                                        color: kTitleColor,
-                                      ),
-                                      trailing: Column(
-                                        crossAxisAlignment: CrossAxisAlignment.end,
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          Text(
-                                            'total_parcel_bank_item'.tr,
-                                            style: kTextStyle.copyWith(color: kTitleColor),
-                                          ),
-                                          const SizedBox(height: 5.0),
-                                          Text(
-                                            dashboard.dashboardData.tParcelBank.toString(),
-                                            style: kTextStyle.copyWith(
-                                                color: kTitleColor,
-                                                fontWeight: FontWeight.bold),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                                Card(
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(10.0),
-                                    child: ListTile(
-                                      contentPadding: EdgeInsets.zero,
-                                      leading: const Icon(
-                                        FontAwesomeIcons.clockRotateLeft,
-                                        color: kTitleColor,
-                                      ),
-                                      trailing: Column(
-                                        crossAxisAlignment: CrossAxisAlignment.end,
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          Text(
-                                            'total_payment_request'.tr,
-                                            style: kTextStyle.copyWith(color: kTitleColor),
-                                          ),
-                                          const SizedBox(height: 5.0),
-                                          Text(
-                                            dashboard.dashboardData.tRequest.toString(),
-                                            style: kTextStyle.copyWith(
-                                                color: kTitleColor,
-                                                fontWeight: FontWeight.bold),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                                Card(
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(10.0),
-                                    child: ListTile(
-                                      contentPadding: EdgeInsets.zero,
-                                      leading: const Icon(
-                                        FontAwesomeIcons.users,
-                                        color: kTitleColor,
-                                      ),
-                                      trailing: Column(
-                                        crossAxisAlignment: CrossAxisAlignment.end,
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          Text(
-                                            'total_fraud_customer'.tr,
-                                            style: kTextStyle.copyWith(color: kTitleColor),
-                                          ),
-                                          const SizedBox(height: 5.0),
-                                          Text(
-                                            dashboard.dashboardData.tFraud.toString(),
-                                            style: kTextStyle.copyWith(
-                                                color: kTitleColor,
-                                                fontWeight: FontWeight.bold),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                ),
-
-                              ],
-                            )
-                          ],
-                        ),
-                      ),
-
                     ],
-                  )
-              )),
+                  ),
+                )
+              ],
+            )
+          ),
+        ],
+      ),
     );
   }
 }
 
 class ServiceItem {
+  ServiceItem(
+    this.title,
+    this.subtitle, {
+    this.iconPath,
+    this.iconData,
+  }) : assert(iconPath != null || iconData != null);
+
   final String title;
   final String subtitle;
-  final String iconPath;
-
-  ServiceItem(this.title, this.subtitle, this.iconPath);
+  final String? iconPath;
+  final IconData? iconData;
 }
 
 class ServiceCard extends StatelessWidget {
+  const ServiceCard({Key? key, required this.service}) : super(key: key);
   final ServiceItem service;
-
-  ServiceCard({required this.service});
 
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      onTap: (){
-        if(service.subtitle == 'pickup_request'){
-          Get.to(() => CreateParcel());
-        }else if(service.subtitle == 'express_delivery'){
-          AccTransaction().launch(context);
-        }else if(service.subtitle == 'pick_drop'){
-          Get.to(() => ShopsPage());
-        }else if(service.subtitle == 'parcels'){
-          Get.to(() => ParcelPage(height: 0.85,));
-        }else if(service.subtitle == 'payments'){
-          Get.to(() => InvoiceList());
-        }else if(service.subtitle == 'support'){
-          Get.to(() => Support());
-        }else if(service.subtitle == 'fraud'){
-          Get.to(() => Frauds());
-        }
-      },
+      onTap: () => _onTap(context),
+      borderRadius: BorderRadius.circular(14.r),
       child: Container(
-        padding: EdgeInsets.symmetric(vertical: 5.h, horizontal: 5.w),
+        padding: EdgeInsets.symmetric(vertical: 8.h, horizontal: 4.w),
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(16.r),
+          borderRadius: BorderRadius.circular(14.r),
+          border: Border.all(color: kAccentLine.withOpacity(0.45)),
           boxShadow: [
             BoxShadow(
-              color: Colors.grey.withOpacity(0.15),
-              blurRadius: 5,
-              spreadRadius: 1,
-              offset: Offset(0, 2),
+              color: kMainColor.withOpacity(0.05),
+              blurRadius: 8,
+              offset: const Offset(0, 2),
             ),
           ],
         ),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Image.asset(service.iconPath, width: 48.w, height: 48.h),
-            SizedBox(height: 5.h),
+            if (service.iconData != null)
+              Icon(service.iconData, size: 26.sp, color: kMainColor)
+            else
+              Image.asset(service.iconPath!, width: 36.w, height: 36.h),
+            SizedBox(height: 6.h),
             Text(
               service.title,
               textAlign: TextAlign.center,
-              style: TextStyle(fontSize: 12.sp, fontWeight: FontWeight.w500),
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                fontSize: 10.sp,
+                fontWeight: FontWeight.w600,
+                color: kTitleColor,
+                height: 1.15,
+              ),
             ),
-
           ],
         ),
       ),
     );
+  }
+
+  void _onTap(BuildContext context) {
+    if (service.subtitle == 'pickup_request') {
+      Get.to(() => CreateParcel());
+    } else if (service.subtitle == 'express_delivery') {
+      // preserved from original; route if used later
+    } else if (service.subtitle == 'pick_drop') {
+      Get.to(() => ShopsPage());
+    } else if (service.subtitle == 'parcels') {
+      Get.to(() => ParcelPage(height: 0.85));
+    } else if (service.subtitle == 'payments') {
+      Get.to(() => InvoiceList());
+    } else if (service.subtitle == 'support') {
+      Get.to(() => Support());
+    } else if (service.subtitle == 'fraud') {
+      Get.to(() => Frauds());
+    } else if (service.subtitle == 'check_balance') {
+      const BalanceDetails().launch(context);
+    } else if (service.subtitle == 'parcel_planner') {
+      // Routing added later
+    }
   }
 }

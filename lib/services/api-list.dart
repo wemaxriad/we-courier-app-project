@@ -1,6 +1,7 @@
 class APIList {
-  static String? mainUrl = "https://apps.wemaxdevs.com/";
-  static String? apiUrl = "apps.wemaxdevs.com";
+  static String? mainUrl = "https://wecourier.wemaxit.com/";
+  //static String? mainUrl = "https://app.rtdeliveries.net/";
+  static String? apiUrl = "courierxbd.com";
   static String? mapGoogleApiKey = "";
 
   static String? server = "${mainUrl}api/v10/";

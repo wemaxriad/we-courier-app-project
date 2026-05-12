@@ -3,7 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 
 
 
- const kMainColor = Color(0xFF7e0095);
+ const kMainColor = Color(0xFF7E0095);
  const kBgColor = Color(0xFFfafafb);
  const Color itembg = Color(0xffEFF0F6);
  const Color deleveryColor = Color(0xffBDEFFF);
@@ -20,6 +20,12 @@ import 'package:google_fonts/google_fonts.dart';
  const Color borderColor = Color(0xffE3EBFF);
  const Color redColor = Color(0xffDD2702);
 const Color textWhiteColor = Colors.white;
+
+/// Dashboard / accent (purple–pink family from kMainColor + kSecondaryColor)
+const Color kAccentLight = Color(0xFFF5EDFA);
+const Color kAccentLine = Color(0xFFE8D4F2);
+const Color kDashboardPurpleTint = Color(0xFFEDE4F7);
+const List<Color> kPrimaryGradientColors = [kMainColor, kSecondaryColor];
 
 const kDangerColor = Color(0xFFff407b);
 final kTextStyle = GoogleFonts.manrope(
@@ -62,54 +68,4 @@ final otpInputDecoration = InputDecoration(
   enabledBorder: outlineInputBorder(),
 );
 
-List<String> businessCategory = [
-  'Fashion Store',
-  'Electronics Store',
-  'Computer Store',
-  'Vegetable Store',
-  'Sweet Store',
-  'Meat Store'
-];
-List<String> language = [
-  'English',
-  'Bengali',
-  'Hindi',
-  'Urdu',
-  'French',
-  'Spanish'
-];
-
-List<String> productCategory = [
-  'Fashion',
-  'Electronics',
-  'Computer',
-  'Gadgets',
-  'Watches',
-  'Cloths'
-];
-
-
-List<String> userRole = [
-  'Super Admin',
-  'Admin',
-  'User',
-];
-
-List<String> paymentType = [
-  'Cheque',
-  'Deposit',
-  'Cash',
-  'Transfer',
-  'Sales',
-];
-List<String> posStats = [
-  'Daily',
-  'Monthly',
-  'Yearly',
-];
-List<String> saleStats = [
-  'Weekly',
-  'Monthly',
-  'Yearly',
-];
 

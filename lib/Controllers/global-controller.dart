@@ -24,6 +24,8 @@ class GlobalController extends GetxController {
   String? userImage;
   String? userName;
   String? userEmail;
+  String? userPhone;
+  String? userAddress;
 
   String? get currency => currencyName;
   List<Hubs> hubList = <Hubs>[];
@@ -112,6 +114,8 @@ class GlobalController extends GetxController {
           userName = profileData.data!.user!.name;
           userEmail = profileData.data!.user!.email;
           userImage = profileData.data!.user!.image;
+          userPhone = profileData.data!.user!.phone;
+          userAddress = profileData.data!.user!.address;
           Future.delayed(Duration(milliseconds: 10), () {
             update();
           });
