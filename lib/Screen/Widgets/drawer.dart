@@ -389,15 +389,13 @@
 // }
 //
 
-// drawer_geometric.dart
-
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_feather_icons/flutter_feather_icons.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
-import 'package:google_fonts/google_fonts.dart';   // যদি না থাকে, নিচে কমেন্ট করা অংশ ব্যবহার করুন
+import 'package:google_fonts/google_fonts.dart';
 import 'package:nb_utils/nb_utils.dart';
 import 'package:shimmer/shimmer.dart';
 
@@ -421,131 +419,133 @@ class DrawerView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Drawer(
-      backgroundColor: kBgColor,
-      child: Container(
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.only(
-            topRight: Radius.circular(24.r),
-            bottomRight: Radius.circular(24.r),
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: kMainColor.withOpacity(0.05),
-              blurRadius: 20,
-              offset: const Offset(4, 0),
+    // drawer width কমানো
+    return SizedBox(
+      width: 260.w,
+      child: Drawer(
+        backgroundColor: kBgColor,
+        child: Container(
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.only(
+              topRight: Radius.circular(24.r),
+              bottomRight: Radius.circular(24.r),
             ),
-          ],
-        ),
-        child: Column(
-          children: [
-            // নতুন জ্যামিতিক হেডার
-            _buildDrawerGeometricHeader(context),
-            // মেনু আইটেম (স্ক্রোলেবল)
-            Expanded(
-              child: SingleChildScrollView(
-                padding: EdgeInsets.symmetric(vertical: 8.h),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    _buildMenuItem(
-                      icon: FontAwesomeIcons.house,
-                      title: 'dashboard'.tr,
-                      onTap: () => const Home().launch(context),
-                    ),
-                    _buildMenuItem(
-                      icon: FontAwesomeIcons.shop,
-                      title: 'shop'.tr,
-                      onTap: () => const ShopsPage().launch(context),
-                    ),
-                    _buildExpansionTile(
-                      icon: FontAwesomeIcons.solidFileLines,
-                      title: 'parcels'.tr,
-                      children: [
-                        _buildSubMenuItem(
-                          title: 'parcels'.tr,
-                          onTap: () => ParcelPage(height: 0.85).launch(context),
-                        ),
-                        _buildSubMenuItem(
-                          title: 'Parcel Categories'.tr,
-                          onTap: () => const ParcelAllStatus().launch(context),
-                        ),
-                      ],
-                    ),
-                    _buildMenuItem(
-                      icon: FontAwesomeIcons.boxArchive,
-                      title: 'fraud_check'.tr,
-                      onTap: () => const Frauds().launch(context),
-                    ),
-                    _buildExpansionTile(
-                      icon: FontAwesomeIcons.users,
-                      title: 'Payments'.tr,
-                      children: [
-                        _buildSubMenuItem(
-                          title: 'payment_account'.tr,
-                          onTap: () => const PaymentAcc().launch(context),
-                        ),
-                        _buildSubMenuItem(
-                          title: 'payment_request'.tr,
-                          onTap: () => const PaymentReq().launch(context),
-                        ),
-                        _buildSubMenuItem(
-                          title: 'Payments/Invoices'.tr,
-                          onTap: () => const InvoiceList().launch(context),
-                        ),
-                      ],
-                    ),
-                    _buildExpansionTile(
-                      icon: FontAwesomeIcons.solidFileLines,
-                      title: 'reports'.tr,
-                      children: [
-                        _buildSubMenuItem(
-                          title: 'account_transaction'.tr,
-                          onTap: () => const AccTransaction().launch(context),
-                        ),
-                        _buildSubMenuItem(
-                          title: 'statements'.tr,
-                          onTap: () => const DateToDateStatement().launch(context),
-                        ),
-                      ],
-                    ),
-                    _buildExpansionTile(
-                      icon: FontAwesomeIcons.gears,
-                      title: 'setting'.tr,
-                      children: [
-                        _buildSubMenuItem(
-                          title: 'cod_charges'.tr,
-                          onTap: () => const CodChargeList().launch(context),
-                        ),
-                        _buildSubMenuItem(
-                          title: 'delivery_charges'.tr,
-                          onTap: () => const DeliveryChargeList().launch(context),
-                        ),
-                      ],
-                    ),
-                    const Divider(height: 24, thickness: 1, color: kAccentLine),
-                    _buildMenuItem(
-                      icon: Icons.exit_to_app,
-                      title: 'log_out'.tr,
-                      onTap: () {
-                        Get.find<GlobalController>().userLogout();
-                        Navigator.of(context).pop();
-                      },
-                      isLogout: true,
-                    ),
-                    SizedBox(height: 20.h),
-                  ],
+            boxShadow: [
+              BoxShadow(
+                color: kMainColor.withOpacity(0.05),
+                blurRadius: 20,
+                offset: const Offset(4, 0),
+              ),
+            ],
+          ),
+          child: Column(
+            children: [
+              _buildDrawerGeometricHeader(context),
+              Expanded(
+                child: SingleChildScrollView(
+                  padding: EdgeInsets.symmetric(vertical: 4.h), // padding কমানো
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _buildMenuItem(
+                        icon: FontAwesomeIcons.house,
+                        title: 'dashboard'.tr,
+                        onTap: () => const Home().launch(context),
+                      ),
+                      _buildMenuItem(
+                        icon: FontAwesomeIcons.shop,
+                        title: 'shop'.tr,
+                        onTap: () => const ShopsPage().launch(context),
+                      ),
+                      _buildExpansionTile(
+                        icon: FontAwesomeIcons.solidFileLines,
+                        title: 'parcels'.tr,
+                        children: [
+                          _buildSubMenuItem(
+                            title: 'parcels'.tr,
+                            onTap: () => ParcelPage(height: 0.85).launch(context),
+                          ),
+                          _buildSubMenuItem(
+                            title: 'Parcel Categories'.tr,
+                            onTap: () => const ParcelAllStatus().launch(context),
+                          ),
+                        ],
+                      ),
+                      _buildMenuItem(
+                        icon: FontAwesomeIcons.boxArchive,
+                        title: 'fraud_check'.tr,
+                        onTap: () => const Frauds().launch(context),
+                      ),
+                      _buildExpansionTile(
+                        icon: FontAwesomeIcons.users,
+                        title: 'Payments'.tr,
+                        children: [
+                          _buildSubMenuItem(
+                            title: 'payment_account'.tr,
+                            onTap: () => const PaymentAcc().launch(context),
+                          ),
+                          _buildSubMenuItem(
+                            title: 'payment_request'.tr,
+                            onTap: () => const PaymentReq().launch(context),
+                          ),
+                          _buildSubMenuItem(
+                            title: 'Payments/Invoices'.tr,
+                            onTap: () => const InvoiceList().launch(context),
+                          ),
+                        ],
+                      ),
+                      _buildExpansionTile(
+                        icon: FontAwesomeIcons.solidFileLines,
+                        title: 'reports'.tr,
+                        children: [
+                          _buildSubMenuItem(
+                            title: 'account_transaction'.tr,
+                            onTap: () => const AccTransaction().launch(context),
+                          ),
+                          _buildSubMenuItem(
+                            title: 'statements'.tr,
+                            onTap: () => const DateToDateStatement().launch(context),
+                          ),
+                        ],
+                      ),
+                      _buildExpansionTile(
+                        icon: FontAwesomeIcons.gears,
+                        title: 'setting'.tr,
+                        children: [
+                          _buildSubMenuItem(
+                            title: 'cod_charges'.tr,
+                            onTap: () => const CodChargeList().launch(context),
+                          ),
+                          _buildSubMenuItem(
+                            title: 'delivery_charges'.tr,
+                            onTap: () => const DeliveryChargeList().launch(context),
+                          ),
+                        ],
+                      ),
+                      Divider(height: 12.h, thickness: 1, color: kAccentLine), // height কমানো
+                      _buildMenuItem(
+                        icon: Icons.exit_to_app,
+                        title: 'log_out'.tr,
+                        onTap: () {
+                          Get.find<GlobalController>().userLogout();
+                          Navigator.of(context).pop();
+                        },
+                        isLogout: true,
+                      ),
+                      SizedBox(height: 16.h),
+                    ],
+                  ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
   }
 
-  // ==================== জ্যামিতিক হেডার (আপনার দেওয়া কোড থেকে নেওয়া) ====================
+  // হেডার: ইমেজ উপরে, বাকি তথ্য নিচে (কলাম)
   Widget _buildDrawerGeometricHeader(BuildContext context) {
     final topInset = MediaQuery.of(context).padding.top;
     const bodyH = 218.0;
@@ -586,21 +586,21 @@ class DrawerView extends StatelessWidget {
               ),
             ),
             Positioned(
-              left: 14,
-              right: 10,
-              top: topInset + 14,
-              bottom: 14,
+              left: 16,
+              right: 16,
+              top: topInset + 16,
+              bottom: 16,
               child: GetBuilder<GlobalController>(
                 builder: (gc) {
                   final name = gc.userName?.trim() ?? '';
                   final email = gc.userEmail?.trim() ?? '';
                   final phone = gc.userPhone?.trim() ?? '';
                   final address = gc.userAddress?.trim() ?? '';
-                  final hasImg =
-                      gc.userImage != null && gc.userImage!.trim().isNotEmpty;
-                  return Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                  final hasImg = gc.userImage != null && gc.userImage!.trim().isNotEmpty;
+                  return Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
+                      // ইমেজ উপরে
                       Container(
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
@@ -614,81 +614,75 @@ class DrawerView extends StatelessWidget {
                           ],
                         ),
                         child: hasImg
-                            ? _buildProfileImage(
-                          imageUrl: gc.userImage,
-                          radius: 36,
-                        )
+                            ? _buildProfileImage(imageUrl: gc.userImage, radius: 40)
                             : CircleAvatar(
-                          radius: 36,
+                          radius: 40,
                           backgroundColor: Colors.white,
                           child: Text(
                             _drawerInitialsFromName(name),
                             style: GoogleFonts.montserrat(
                               fontWeight: FontWeight.w700,
-                              fontSize: 22,
+                              fontSize: 24,
                               color: kMainColor,
                             ),
                           ),
                         ),
                       ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            if (name.isNotEmpty)
-                              Text(
-                                name.toUpperCase(),
-                                style: GoogleFonts.montserrat(
-                                  fontWeight: FontWeight.w700,
-                                  fontSize: 14,
-                                  color: Colors.white,
-                                  letterSpacing: 0.4,
-                                ),
-                                maxLines: 2,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            if (email.isNotEmpty) ...[
-                              const SizedBox(height: 6),
-                              Text(
-                                email,
-                                style: GoogleFonts.montserrat(
-                                  fontWeight: FontWeight.w400,
-                                  fontSize: 13,
-                                  color: Colors.white.withOpacity(0.95),
-                                ),
-                                maxLines: 2,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ],
-                            if (phone.isNotEmpty) ...[
-                              const SizedBox(height: 4),
-                              Text(
-                                phone,
-                                style: GoogleFonts.montserrat(
-                                  fontWeight: FontWeight.w400,
-                                  fontSize: 12,
-                                  color: Colors.white.withOpacity(0.92),
-                                ),
-                              ),
-                            ],
-                            if (address.isNotEmpty) ...[
-                              const SizedBox(height: 4),
-                              Text(
-                                address,
-                                style: GoogleFonts.montserrat(
-                                  fontWeight: FontWeight.w400,
-                                  fontSize: 11,
-                                  color: Colors.white.withOpacity(0.88),
-                                ),
-                                maxLines: 2,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ],
-                          ],
+                      SizedBox(height: 12.h),
+                      // নাম ও অন্যান্য তথ্য সেন্টার অ্যালাইনমেন্ট সহ
+                      if (name.isNotEmpty)
+                        Text(
+                          name.toUpperCase(),
+                          style: GoogleFonts.montserrat(
+                            fontWeight: FontWeight.w700,
+                            fontSize: 14,
+                            color: Colors.white,
+                            letterSpacing: 0.4,
+                          ),
+                          textAlign: TextAlign.center,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
                         ),
-                      ),
+                      if (email.isNotEmpty) ...[
+                        SizedBox(height: 6.h),
+                        Text(
+                          email,
+                          style: GoogleFonts.montserrat(
+                            fontWeight: FontWeight.w400,
+                            fontSize: 12,
+                            color: Colors.white.withOpacity(0.95),
+                          ),
+                          textAlign: TextAlign.center,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ],
+                      if (phone.isNotEmpty) ...[
+                        SizedBox(height: 4.h),
+                        Text(
+                          phone,
+                          style: GoogleFonts.montserrat(
+                            fontWeight: FontWeight.w400,
+                            fontSize: 11,
+                            color: Colors.white.withOpacity(0.92),
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ],
+                      if (address.isNotEmpty) ...[
+                        SizedBox(height: 4.h),
+                        Text(
+                          address,
+                          style: GoogleFonts.montserrat(
+                            fontWeight: FontWeight.w400,
+                            fontSize: 10,
+                            color: Colors.white.withOpacity(0.88),
+                          ),
+                          textAlign: TextAlign.center,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ],
                     ],
                   );
                 },
@@ -700,7 +694,7 @@ class DrawerView extends StatelessWidget {
     );
   }
 
-  // হেল্পার মেথড: প্রোফাইল ইমেজ (ক্যাশড নেটওয়ার্ক ইমেজ)
+  // হেল্পার মেথড: প্রোফাইল ইমেজ
   Widget _buildProfileImage({required String? imageUrl, required double radius}) {
     return ClipOval(
       child: CachedNetworkImage(
@@ -722,7 +716,6 @@ class DrawerView extends StatelessWidget {
     );
   }
 
-  // নাম থেকে ইনিশিয়াল নেয়ার ফাংশন
   String _drawerInitialsFromName(String name) {
     final parts = name.trim().split(' ');
     if (parts.isEmpty) return '?';
@@ -730,7 +723,7 @@ class DrawerView extends StatelessWidget {
     return (parts[0][0] + parts[1][0]).toUpperCase();
   }
 
-  // ==================== মেনু আইটেম উইজেট (আগের রিডিজাইন থেকেই) ====================
+  // মেনু আইটেম – gap কমানো (vertical padding 2.h)
   Widget _buildMenuItem({
     required IconData icon,
     required String title,
@@ -738,23 +731,23 @@ class DrawerView extends StatelessWidget {
     bool isLogout = false,
   }) {
     return ListTile(
-      contentPadding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 4.h),
+      contentPadding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 2.h),
       leading: Icon(
         icon,
-        size: 22.sp,
+        size: 20.sp,
         color: isLogout ? kDangerColor : kMainColor,
       ),
       title: Text(
         title,
         style: TextStyle(
-          fontSize: 14.sp,
+          fontSize: 13.sp,
           fontWeight: FontWeight.w600,
           color: isLogout ? kDangerColor : kTitleColor,
         ),
       ),
       trailing: Icon(
         FeatherIcons.chevronRight,
-        size: 18.sp,
+        size: 16.sp,
         color: kGreyTextColor,
       ),
       onTap: onTap,
@@ -769,22 +762,22 @@ class DrawerView extends StatelessWidget {
     return Theme(
       data: Theme.of(Get.context!).copyWith(dividerColor: Colors.transparent),
       child: ExpansionTile(
-        leading: Icon(icon, size: 22.sp, color: kMainColor),
+        leading: Icon(icon, size: 20.sp, color: kMainColor),
         title: Text(
           title,
           style: TextStyle(
-            fontSize: 14.sp,
+            fontSize: 13.sp,
             fontWeight: FontWeight.w600,
             color: kTitleColor,
           ),
         ),
         trailing: Icon(
           FeatherIcons.chevronDown,
-          size: 18.sp,
+          size: 16.sp,
           color: kGreyTextColor,
         ),
-        childrenPadding: EdgeInsets.only(left: 48.w),
-        tilePadding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 4.h),
+        childrenPadding: EdgeInsets.only(left: 44.w),
+        tilePadding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 2.h),
         children: children,
       ),
     );
@@ -799,7 +792,7 @@ class DrawerView extends StatelessWidget {
       title: Text(
         title,
         style: TextStyle(
-          fontSize: 13.sp,
+          fontSize: 12.sp,
           fontWeight: FontWeight.w500,
           color: kGreyTextColor,
         ),

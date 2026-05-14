@@ -2,9 +2,10 @@ import '/Screen/Shops/create_shop.dart';
 import '/Screen/Shops/edit_shop.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_feather_icons/flutter_feather_icons.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:nb_utils/nb_utils.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:nb_utils/nb_utils.dart' hide redColor;
 import '../../Controllers/shop_controller.dart';
+import '../../Models/shop_model.dart';
 import '../Widgets/constant.dart';
 import 'package:get/get.dart';
 
@@ -59,11 +60,11 @@ class _ShopsState extends State<ShopsPage> {
                                 child: Text(
                                   'yes'.tr,
                                   style:
-                                  kTextStyle.copyWith(color: kTitleColor),
+                                      kTextStyle.copyWith(color: kTitleColor),
                                   textAlign: TextAlign.center,
                                 ),
                               ),
-                            ).onTap(() =>shopController.shopDelete(id))),
+                            ).onTap(() => shopController.shopDelete(id))),
                         const SizedBox(width: 10.0),
                         Expanded(
                           flex: 1,
@@ -81,7 +82,7 @@ class _ShopsState extends State<ShopsPage> {
                               ),
                             ),
                           ).onTap(
-                                () => Get.back(),
+                            () => Get.back(),
                           ),
                         ),
                       ],
@@ -96,6 +97,227 @@ class _ShopsState extends State<ShopsPage> {
     );
   }
 
+  int _activeShopCount(List<ShopsData> shops) {
+    return shops.where((shop) => shop.status == 1).length;
+  }
+
+  bool _isDefaultShop(ShopsData shop) {
+    final value = shop.defaultShop?.toLowerCase();
+    return value == '1' || value == 'true' || value == 'yes';
+  }
+
+  bool _isActiveShop(ShopsData shop) {
+    return shop.status == 1;
+  }
+
+  Widget _buildSummarySection(List<ShopsData> shops) {
+    return Padding(
+      padding: EdgeInsets.only(bottom: 12.h),
+      child: Row(
+        children: [
+          Expanded(
+            child: _buildSummaryTile(
+              value: shops.length.toString(),
+              label: 'shops'.tr,
+            ),
+          ),
+          SizedBox(width: 12.w),
+          Expanded(
+            child: _buildSummaryTile(
+              value: _activeShopCount(shops).toString(),
+              label: 'active'.tr,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSummaryTile({required String value, required String label}) {
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 14.h),
+      decoration: BoxDecoration(
+        color: kAccentLight,
+        borderRadius: BorderRadius.circular(14.r),
+        border: Border.all(color: kAccentLine),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            value,
+            style: kTextStyle.copyWith(
+              color: kMainColor,
+              fontSize: 22.sp,
+              fontWeight: FontWeight.w800,
+            ),
+          ),
+          SizedBox(height: 4.h),
+          Text(
+            label,
+            style: kTextStyle.copyWith(
+              color: kGreyTextColor,
+              fontSize: 12.sp,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildShopCard(ShopsData shop) {
+    final isActive = _isActiveShop(shop);
+
+    return Container(
+      margin: EdgeInsets.only(bottom: 12.h),
+      padding: EdgeInsets.all(14.w),
+      decoration: BoxDecoration(
+        color: kBgColor,
+        borderRadius: BorderRadius.circular(14.r),
+        border: Border.all(color: kAccentLine),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(
+                child: Text(
+                  shop.name.toString(),
+                  style: kTextStyle.copyWith(
+                    color: kTitleColor,
+                    fontSize: 16.sp,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ),
+              if (_isDefaultShop(shop)) ...[
+                SizedBox(width: 8.w),
+                Container(
+                  padding:
+                      EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
+                  decoration: BoxDecoration(
+                    color: kSecondaryColor.withOpacity(0.12),
+                    borderRadius: BorderRadius.circular(20.r),
+                  ),
+                  child: Text(
+                    'Default',
+                    style: kTextStyle.copyWith(
+                      color: kSecondaryColor,
+                      fontSize: 11.sp,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ),
+              ],
+            ],
+          ),
+          SizedBox(height: 10.h),
+          Container(
+            padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
+            decoration: BoxDecoration(
+              color: isActive
+                  ? green.withOpacity(0.12)
+                  : kGreyTextColor.withOpacity(0.12),
+              borderRadius: BorderRadius.circular(20.r),
+            ),
+            child: Text(
+              shop.statusName.toString(),
+              style: kTextStyle.copyWith(
+                color: isActive ? green : kGreyTextColor,
+                fontSize: 11.sp,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+          SizedBox(height: 12.h),
+          _buildDetailRow('contact'.tr, shop.contactNo.toString()),
+          SizedBox(height: 8.h),
+          _buildDetailRow('address'.tr, shop.address.toString()),
+          SizedBox(height: 14.h),
+          Row(
+            children: [
+              Expanded(
+                child: OutlinedButton(
+                  onPressed: () =>
+                      EditShops(shop: shop).launch(context),
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: kMainColor,
+                    side: const BorderSide(color: kMainColor),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10.r),
+                    ),
+                    padding: EdgeInsets.symmetric(vertical: 10.h),
+                  ),
+                  child: Text(
+                    'edit'.tr,
+                    style: kTextStyle.copyWith(
+                      color: kMainColor,
+                      fontSize: 13.sp,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              ),
+              SizedBox(width: 10.w),
+              Expanded(
+                child: TextButton(
+                  onPressed: () => showPopUp(shop.id.toString()),
+                  style: TextButton.styleFrom(
+                    backgroundColor: redColor.withOpacity(0.1),
+                    foregroundColor: redColor,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10.r),
+                    ),
+                    padding: EdgeInsets.symmetric(vertical: 10.h),
+                  ),
+                  child: Text(
+                    'delete'.tr,
+                    style: kTextStyle.copyWith(
+                      color: redColor,
+                      fontSize: 13.sp,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildDetailRow(String label, String value) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          '$label:',
+          style: kTextStyle.copyWith(
+            color: kTitleColor,
+            fontSize: 13.sp,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+        SizedBox(width: 8.w),
+        Expanded(
+          child: Text(
+            value,
+            textAlign: TextAlign.end,
+            style: kTextStyle.copyWith(
+              color: kGreyTextColor,
+              fontSize: 13.sp,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -107,167 +329,47 @@ class _ShopsState extends State<ShopsPage> {
           style: kTextStyle.copyWith(
               color: kBgColor, fontWeight: FontWeight.bold, fontSize: 18.0),
         ),
-        actions: [
-          Padding(
-            padding: const EdgeInsets.all(15.0),
-            child: Container(
-                padding: const EdgeInsets.only(left: 10.0, right: 10.0),
-                decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(2.0),
-                    color: kBgColor),
-                child: const Icon(
-                  FeatherIcons.plus,
-                  size: 18.0,
-                  color: Colors.black,
-                )),
-          ).onTap(
-                () => const CreateShops().launch(context),
-          ),
-        ],
         backgroundColor: kMainColor,
         elevation: 0.0,
         iconTheme: const IconThemeData(color: kBgColor),
       ),
-      body:  GetBuilder<ShopController>(
-          init: ShopController(),
-          builder: (shop) =>
-              Container(
-                padding: const EdgeInsets.all(10.0),
-                width: MediaQuery.of(context).size.width,
-                decoration: const BoxDecoration(
-                  borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(30.0),
-                    topRight: Radius.circular(30.0),
-                  ),
-                  color: Colors.white,
-                ),
-                child: shop.loader ? ShopShimmer() : shop.shopList.isNotEmpty? ListView.builder(
-                  itemCount: shop.shopList.length,
-                  itemBuilder: (_, i) {
-                    return Padding(
-                      padding: const EdgeInsets.only(top: 10.0),
-                      child: Column(
-                        children: [
-                          Card(
-                            color: kBgColor,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10.0),
-                            ),
-                            child: Padding(
-                              padding: const EdgeInsets.all(10.0),
-                              child: Column(
-                                crossAxisAlignment:
-                                CrossAxisAlignment.start,
-                                children: [
-                                  Material(
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius:
-                                      BorderRadius.circular(5.0),
-                                    ),
-                                    elevation: 0.5,
-                                    child: Container(
-                                      width: MediaQuery.of(context).size.width,
-                                      decoration: BoxDecoration(
-                                        borderRadius:
-                                        BorderRadius.circular(5.0),
-                                        color: Colors.white,
-                                      ),
-                                      child: Column(
-                                        crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                        children: [
-                                          Padding(
-                                            padding:
-                                            const EdgeInsets.all(10.0),
-                                            child:
-                                            Row(
-                                              mainAxisSize: MainAxisSize.min,
-                                              children: [
-                                                Text(
-                                                  shop.shopList[i].statusName.toString() ,
-                                                  style: kTextStyle.copyWith(color: kTitleColor),
-                                                ),
-                                                const Spacer(),
-                                                const Icon(FontAwesomeIcons.penToSquare,
-                                                    color: kTitleColor, size: 16.0).onTap(()=> EditShops(shop:shop.shopList[i]).launch(context),),
-                                                const SizedBox(width: 20.0),
-                                                const Icon(FontAwesomeIcons.trash,
-                                                    color: kTitleColor, size: 16.0)
-                                                    .onTap(
-                                                      () => showPopUp(shop.shopList[i].id.toString()),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                  const SizedBox(height: 10.0),
-                                  Row(
-                                    children: [
-                                      Text(
-                                        'name'.tr+':',
-                                        style: kTextStyle.copyWith(
-                                            color: kTitleColor,
-                                            fontWeight: FontWeight.bold),
-                                      ),
-                                      const Spacer(),
-                                      Text(
-                                        shop.shopList[i].name.toString(),
-                                        style: kTextStyle.copyWith(
-                                            color: kGreyTextColor),
-                                      ),
-                                    ],
-                                  ),
-                                  const SizedBox(height: 5.0),
-                                  Row(
-                                    children: [
-                                      Text(
-                                        'contact'.tr+':',
-                                        style: kTextStyle.copyWith(
-                                            color: kTitleColor,
-                                            fontWeight: FontWeight.bold),
-                                      ),
-                                      const Spacer(),
-                                      Text(
-                                        shop.shopList[i].contactNo.toString(),
-                                        style: kTextStyle.copyWith(
-                                            color: kGreyTextColor),
-                                      ),
-                                    ],
-                                  ),
-                                  const SizedBox(height: 5.0),
-                                  Row(
-                                    children: [
-                                      SizedBox(
-                                        width: 70,
-                                        child:
-                                      Text(
-                                        'address'.tr+':',
-                                        style: kTextStyle.copyWith(
-                                            color: kTitleColor,
-                                            fontWeight: FontWeight.bold),
-                                      )),
-                                      Flexible(child:
-                                      Text(
-                                        shop.shopList[i].address.toString(),
-                                        style: kTextStyle.copyWith(
-                                            color: kGreyTextColor),
-                                      )),
-                                    ],
-                                  ),
-                                  const SizedBox(height: 5.0),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    );
-                  },
-                ) :Center(child: Text("No data found!"),),
-              )
+      floatingActionButton: FloatingActionButton(
+        onPressed: () => const CreateShops().launch(context),
+        backgroundColor: kMainColor,
+        elevation: 4,
+        child: const Icon(
+          FeatherIcons.plus,
+          color: Colors.white,
+        ),
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
+      body: GetBuilder<ShopController>(
+        init: ShopController(),
+        builder: (shop) => Container(
+          width: MediaQuery.of(context).size.width,
+          decoration: const BoxDecoration(
+            borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(28.0),
+              topRight: Radius.circular(28.0),
+            ),
+            color: Colors.white,
+          ),
+          child: shop.loader
+              ? const ShopShimmer()
+              : shop.shopList.isNotEmpty
+                  ? ListView.builder(
+                      padding:
+                          EdgeInsets.fromLTRB(16.w, 16.h, 16.w, 96.h),
+                      itemCount: shop.shopList.length + 1,
+                      itemBuilder: (_, index) {
+                        if (index == 0) {
+                          return _buildSummarySection(shop.shopList);
+                        }
+                        return _buildShopCard(shop.shopList[index - 1]);
+                      },
+                    )
+                  : Center(child: Text("No data found!")),
+        ),
       ),
     );
   }

@@ -9,6 +9,8 @@ import 'package:material_design_icons_flutter/material_design_icons_flutter.dart
 import 'package:nb_utils/nb_utils.dart' hide redColor;
 import 'package:shimmer/shimmer.dart';
 
+import '../Payment/PaymentRequest/create_payment_request.dart';
+import '/Controllers/balance_controller.dart';
 import '/Controllers/dashboard_controller.dart';
 import '/Screen/Frauds/frauds.dart';
 import '/Screen/Parcel/parcel_index.dart';
@@ -39,6 +41,7 @@ class _DashBoardState extends State<DashBoard> {
   LanguageController languageController = Get.put(LanguageController());
   DashboardController dashboard = Get.put(DashboardController());
   GlobalController globalController = Get.put(GlobalController());
+  BalanceController balanceController = Get.put(BalanceController());
 
   Language? selectedLang;
   int _carouselPage = 0;
@@ -293,11 +296,15 @@ class _DashBoardState extends State<DashBoard> {
   }
 
   Widget _buildOfferCarousel(DashboardController dashboard) {
+    const bannerAspect = 16 / 9;
+    const viewportFraction = 0.88;
+    final slideWidth = (1.sw - 32.w) * viewportFraction;
+    final carouselHeight = slideWidth / bannerAspect;
     final count = _carouselItemCount(dashboard);
     return CarouselSlider.builder(
       options: CarouselOptions(
-        height: 190.h,
-        viewportFraction: 0.88,
+        height: carouselHeight,
+        viewportFraction: viewportFraction,
         enlargeCenterPage: true,
         enlargeFactor: 0.12,
         autoPlay: count > 1,
@@ -308,58 +315,57 @@ class _DashBoardState extends State<DashBoard> {
       ),
       itemCount: count,
       itemBuilder: (context, index, realIndex) {
-        final child = dashboard.offersList.isNotEmpty
-            ? CachedNetworkImage(
-                imageUrl: dashboard.offersList[index].image.toString(),
-                fit: BoxFit.cover,
-                width: double.infinity,
-                placeholder: (context, url) => Shimmer.fromColors(
-                  baseColor: Colors.grey[300]!,
-                  highlightColor: Colors.grey[400]!,
-                  child: Container(
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(16.r),
-                      color: Colors.white,
-                    ),
-                  ),
-                ),
-                errorWidget: (context, url, error) => Image.asset(
-                  imageList[index % imageList.length],
-                  fit: BoxFit.cover,
-                  width: double.infinity,
-                ),
-              )
-            : Image.asset(
-                imageList[index % imageList.length],
-                fit: BoxFit.cover,
-                width: double.infinity,
-              );
-
         return ClipRRect(
           borderRadius: BorderRadius.circular(16.r),
-          child: Stack(
-            fit: StackFit.expand,
-            children: [
-              child,
-              Positioned(
-                left: 0,
-                right: 0,
-                bottom: 0,
-                height: 48.h,
-                child: DecoratedBox(
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                      colors: [
-                        Colors.transparent,
-                        Colors.black.withOpacity(0.35),
-                      ],
+          child: SizedBox(
+            width: slideWidth,
+            height: carouselHeight,
+            child: Stack(
+              fit: StackFit.expand,
+              children: [
+                Positioned.fill(
+                  child: dashboard.offersList.isNotEmpty
+                      ? CachedNetworkImage(
+                          imageUrl: dashboard.offersList[index].image.toString(),
+                          fit: BoxFit.cover,
+                          alignment: Alignment.center,
+                          placeholder: (context, url) => Shimmer.fromColors(
+                            baseColor: Colors.grey[300]!,
+                            highlightColor: Colors.grey[400]!,
+                            child: const ColoredBox(color: Colors.white),
+                          ),
+                          errorWidget: (context, url, error) => Image.asset(
+                            imageList[index % imageList.length],
+                            fit: BoxFit.cover,
+                            alignment: Alignment.center,
+                          ),
+                        )
+                      : Image.asset(
+                          imageList[index % imageList.length],
+                          fit: BoxFit.cover,
+                          alignment: Alignment.center,
+                        ),
+                ),
+                Positioned(
+                  left: 0,
+                  right: 0,
+                  bottom: 0,
+                  height: 48.h,
+                  child: DecoratedBox(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [
+                          Colors.transparent,
+                          Colors.black.withOpacity(0.35),
+                        ],
+                      ),
                     ),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         );
       },
@@ -500,14 +506,15 @@ class _DashBoardState extends State<DashBoard> {
 
   Widget _quickActionsGrid() {
     final actions = <ServiceItem>[
-      ServiceItem('check_balance'.tr, 'check_balance', iconData: Icons.account_balance_wallet_rounded),
-      ServiceItem('parcel_planner'.tr, 'parcel_planner', iconData: FontAwesomeIcons.calendarWeek),
+
+      //ServiceItem('parcel_planner'.tr, 'parcel_planner', iconData: FontAwesomeIcons.calendarWeek),
       ServiceItem('pickup_point'.tr, 'pick_drop', iconPath: 'assets/images/pick_drop.png'),
       ServiceItem('create_order'.tr, 'pickup_request', iconPath: 'assets/images/pickup.png'),
       ServiceItem('parcels'.tr, 'parcels', iconPath: 'assets/images/parcel.png'),
       ServiceItem('payments'.tr, 'payments', iconPath: 'assets/images/payment.png'),
       ServiceItem('support'.tr, 'support', iconPath: 'assets/images/support.png'),
       ServiceItem('fraud'.tr, 'fraud', iconPath: 'assets/images/fraud.png'),
+      ServiceItem('check_balance'.tr, 'check_balance', iconData: Icons.account_balance_wallet_rounded),
     ];
 
     return GridView.builder(
@@ -716,7 +723,15 @@ class _PayoutSummaryCard extends StatelessWidget {
                         child: Material(
                           color: Colors.transparent,
                           child: InkWell(
-                            onTap: () {},
+                            onTap: () {
+                              if (Get.find<BalanceController>().loader) {
+                                return;
+                              }
+                              CreatePaymentRequest(
+                                balanceDetails:
+                                    Get.find<BalanceController>().balanceDetails,
+                              ).launch(context);
+                            },
                             borderRadius: BorderRadius.circular(30.r),
                             child: Ink(
                               decoration: BoxDecoration(

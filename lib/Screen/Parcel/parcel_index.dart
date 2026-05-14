@@ -9,7 +9,9 @@ import 'package:get/get.dart';
 import 'package:nb_utils/nb_utils.dart';
 
 import '../../Controllers/global-controller.dart';
+import '../../Controllers/parcel_all_status_controller.dart';
 import '../../Controllers/parcel_controller.dart';
+import '../../Models/parcel_status_model.dart';
 import '../Widgets/constant.dart';
 import '../Widgets/shimmer/parcel_shimmer.dart';
 
@@ -25,6 +27,272 @@ class _ParcelPageState extends State<ParcelPage> {
   DateTime selectedDate = DateTime.now();
   DateTime pickupDate = DateTime.now();
   ParcelController parcelController = ParcelController();
+  int? selectedStatusFilterId;
+
+  List<Parcels> _visibleParcels(
+    List<Parcels> parcels,
+    List<ParcelStatusModel> statuses,
+  ) {
+    if (selectedStatusFilterId == null) {
+      return parcels;
+    }
+
+    ParcelStatusModel? selectedStatus;
+    for (final status in statuses) {
+      if (status.id == selectedStatusFilterId) {
+        selectedStatus = status;
+        break;
+      }
+    }
+
+    if (selectedStatus == null) {
+      return parcels;
+    }
+
+    return parcels.where((parcel) {
+      return parcel.status == selectedStatus!.id ||
+          parcel.statusName == selectedStatus.status;
+    }).toList();
+  }
+
+  Widget _buildHeaderBanner(int count) {
+    return Container(
+      width: double.infinity,
+      padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 12.h),
+      decoration: BoxDecoration(
+        color: kAccentLight,
+        borderRadius: BorderRadius.circular(12.r),
+        border: Border.all(color: kAccentLine),
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 44.w,
+            height: 44.w,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(12.r),
+              border: Border.all(color: kAccentLine),
+            ),
+            child: Icon(
+              FeatherIcons.package,
+              color: kMainColor,
+              size: 22.sp,
+            ),
+          ),
+          SizedBox(width: 12.w),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'parcel_list'.tr,
+                  style: kTextStyle.copyWith(
+                    color: kMainColor,
+                    fontSize: 16.sp,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+                SizedBox(height: 4.h),
+                Text(
+                  '$count ${'total_parcel'.tr}',
+                  style: kTextStyle.copyWith(
+                    color: kGreyTextColor,
+                    fontSize: 11.sp,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildStatusChips(List<ParcelStatusModel> statuses) {
+    return SizedBox(
+      height: 38.h,
+      child: ListView(
+        scrollDirection: Axis.horizontal,
+        children: [
+          _buildStatusChip(
+            label: 'All',
+            isSelected: selectedStatusFilterId == null,
+            onTap: () => setState(() => selectedStatusFilterId = null),
+          ),
+          ...statuses.map(
+            (status) => _buildStatusChip(
+              label: status.status ?? '',
+              isSelected: selectedStatusFilterId == status.id,
+              onTap: () => setState(() => selectedStatusFilterId = status.id),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildStatusChip({
+    required String label,
+    required bool isSelected,
+    required VoidCallback onTap,
+  }) {
+    return Padding(
+      padding: EdgeInsets.only(right: 8.w),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(20.r),
+          child: Ink(
+            padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 8.h),
+            decoration: BoxDecoration(
+              color: isSelected ? kMainColor : Colors.white,
+              borderRadius: BorderRadius.circular(20.r),
+              border: Border.all(
+                color: isSelected ? kMainColor : kAccentLine,
+              ),
+            ),
+            child: Text(
+              label,
+              style: kTextStyle.copyWith(
+                color: isSelected ? Colors.white : kTitleColor,
+                fontSize: 11.sp,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildParcelCard(Parcels parcel) {
+    return Padding(
+      padding: EdgeInsets.only(bottom: 10.h),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: () => ParcelDetails(
+            parcel: parcel,
+            id: parcel.id,
+          ).launch(context),
+          borderRadius: BorderRadius.circular(12.r),
+          child: Ink(
+            decoration: BoxDecoration(
+              color: kBgColor,
+              borderRadius: BorderRadius.circular(12.r),
+              border: Border.all(color: kAccentLine),
+            ),
+            child: Padding(
+              padding: EdgeInsets.all(12.w),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Expanded(
+                        child: RichText(
+                          overflow: TextOverflow.ellipsis,
+                          text: TextSpan(
+                            style: kTextStyle.copyWith(
+                              color: kTitleColor,
+                              fontSize: 12.sp,
+                              fontWeight: FontWeight.w500,
+                            ),
+                            children: [
+                              TextSpan(text: '${'trackingId'.tr} '),
+                              TextSpan(
+                                text: '#${parcel.trackingId}',
+                                style: kTextStyle.copyWith(
+                                  color: kTitleColor,
+                                  fontSize: 13.sp,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      SizedBox(width: 8.w),
+                      Container(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 8.w,
+                          vertical: 4.h,
+                        ),
+                        decoration: BoxDecoration(
+                          color: deleveryColor,
+                          borderRadius: BorderRadius.circular(20.r),
+                        ),
+                        child: Text(
+                          parcel.statusName ?? '',
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: kTextStyle.copyWith(
+                            color: kTitleColor,
+                            fontSize: 10.sp,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 8.h),
+                  Text(
+                    parcel.customerName ?? '',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: kTextStyle.copyWith(
+                      color: kTitleColor,
+                      fontSize: 14.sp,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                  SizedBox(height: 8.h),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          parcel.customerPhone ?? '',
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: kTextStyle.copyWith(
+                            color: kGreyTextColor,
+                            fontSize: 12.sp,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ),
+                      Text(
+                        '${Get.find<GlobalController>().currency}${parcel.cashCollection}',
+                        style: kTextStyle.copyWith(
+                          color: kMainColor,
+                          fontSize: 13.sp,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 6.h),
+                  Text(
+                    parcel.customerAddress ?? '',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: kTextStyle.copyWith(
+                      color: kGreyTextColor,
+                      fontSize: 11.sp,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
 
   Future<void> _selectDate(BuildContext context) async {
     final DateTime? picked = await showDatePicker(context: context, initialDate: selectedDate, firstDate: DateTime(2015, 8), lastDate: DateTime(2101));
@@ -520,10 +788,6 @@ class _ParcelPageState extends State<ParcelPage> {
  double heightValue = 0.78;
   @override
   Widget build(BuildContext context) {
-      setState(() {
-        heightValue = widget.height;
-      });
-
     return Scaffold(
       backgroundColor: kMainColor,
       appBar: AppBar(
@@ -553,12 +817,15 @@ class _ParcelPageState extends State<ParcelPage> {
                   const SizedBox(width: 4.0),
                   Text(
                     'add'.tr,
-                    style: kTextStyle.copyWith(color: kBgColor, fontWeight: FontWeight.bold),
+                    style: kTextStyle.copyWith(
+                      color: kBgColor,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ],
               ),
             ).onTap(
-                  () => Get.to(() => CreateParcel()),
+              () => Get.to(() => CreateParcel()),
             ),
           ),
         ],
@@ -567,298 +834,71 @@ class _ParcelPageState extends State<ParcelPage> {
         iconTheme: const IconThemeData(color: kBgColor),
       ),
       body: GetBuilder<ParcelController>(
-          init: ParcelController(),
-          builder: (parcel) => Container(
-              padding: const EdgeInsets.all(10.0),
-              margin: EdgeInsets.only(top: 20),
-              height: MediaQuery.of(context).size.height,
+        init: ParcelController(),
+        builder: (parcel) => GetBuilder<ParcelAllStatusController>(
+          init: ParcelAllStatusController(),
+          builder: (statusController) {
+            final visibleParcels = _visibleParcels(
+              parcel.parcelList,
+              statusController.parcelAllStatus,
+            );
+
+            return Container(
+              width: MediaQuery.of(context).size.width,
               decoration: const BoxDecoration(
                 borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(30.0),
-                  topRight: Radius.circular(30.0),
+                  topLeft: Radius.circular(28.0),
+                  topRight: Radius.circular(28.0),
                 ),
-                color: Colors.white,
+                color: kBgColor,
               ),
-              child:
-              Column(
-                children: [
-                  Expanded(
-                    child: parcel.loader
-                        ? ParcelShimmer()
-                        : ListView.builder(
-                      padding: EdgeInsets.zero,
-                      itemCount: parcel.parcelList.length,
-                      itemBuilder: (BuildContext context, index) {
-                        return Padding(
-                          padding: EdgeInsets.all(5.r),
-                          child: InkWell(
-                            onTap: () => ParcelDetails(
-                              parcel: parcel.parcelList[index],
-                              id: parcel.parcelList[index].id,
-                            ).launch(context),
-                            child: Container(
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(16.r),
-                                color: Colors.white,
-                                border: Border.all(color: itembg),
+              child: parcel.loader
+                  ? const ParcelShimmer()
+                  : Column(
+                      children: [
+                        Padding(
+                          padding: EdgeInsets.fromLTRB(12.w, 12.h, 12.w, 8.h),
+                          child: Column(
+                            children: [
+                              _buildHeaderBanner(visibleParcels.length),
+                              SizedBox(height: 10.h),
+                              _buildStatusChips(
+                                statusController.parcelAllStatus,
                               ),
-                              child: Padding(
-                                padding: EdgeInsets.all(8.r),
-                                child: Row(
-                                  children: [
-                                    SizedBox(width: 4.w),
-                                    SizedBox(
-                                      width: 300.w,
-                                      child: Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        children: [
-                                          Padding(
-                                            padding: EdgeInsets.only(top: 6.h, bottom: 10.h),
-                                            child: Row(
-                                              children: [
-                                                Text(
-                                                  "trackingId".tr,
-                                                  style: TextStyle(
-                                                    fontSize: 13.sp,
-                                                    fontWeight: FontWeight.w500,
-                                                  ),
-                                                ),
-                                                Text(
-                                                  "#${parcel.parcelList[index].trackingId}",
-                                                  overflow: TextOverflow.ellipsis,
-                                                ),
-                                                const Spacer(),
-                                                Container(
-                                                  padding: EdgeInsets.all(4.r),
-                                                  decoration: BoxDecoration(
-                                                    borderRadius: BorderRadius.circular(10.r),
-                                                    color: deleveryColor,
-                                                  ),
-                                                  child: SizedBox(
-                                                    width: 70,
-                                                    child: Text(
-                                                      parcel.parcelList[index].statusName ?? "",
-                                                      maxLines: 2,
-                                                      textAlign: TextAlign.center,
-                                                      style: TextStyle(fontSize: 8.sp),
-                                                    ),
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                          Text(
-                                            parcel.parcelList[index].customerName ?? "",
-                                            style: TextStyle(
-                                              fontSize: 12.sp,
-                                              color: Colors.grey,
-                                            ),
-                                          ),
-                                          Text(
-                                            parcel.parcelList[index].customerPhone ?? "",
-                                            style: TextStyle(
-                                              fontSize: 12.sp,
-                                              color: Colors.grey,
-                                            ),
-                                          ),
-                                          SizedBox(height: 8.h),
-                                          Text(
-                                            parcel.parcelList[index].customerAddress ?? "",
-                                            style: TextStyle(
-                                              fontSize: 12.sp,
-                                              color: Colors.grey,
-                                            ),
-                                          ),
-                                          SizedBox(height: 8.h),
-                                          Row(
-                                            children: [
-                                              Text(
-                                                "total".tr,
-                                                style: const TextStyle(
-                                                  fontSize: 14,
-                                                  fontWeight: FontWeight.w500,
-                                                ),
-                                              ),
-                                              Text(
-                                                " ${Get.find<GlobalController>().currency}${parcel.parcelList[index].cashCollection}",
-                                              ),
-                                              const Spacer(),
-                                              Text("SEE_PARCEL_DETAILS".tr, style: TextStyle(color: kMainColor)),
-                                              SizedBox(width: 2.w),
-                                              const Icon(
-                                                IconData(0xe09c, fontFamily: 'MaterialIcons'),
-                                                size: 16,
-                                                color: kMainColor,
-                                              ),
-                                            ],
-                                          )
-                                        ],
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
+                            ],
                           ),
-                        );
-                      },
+                        ),
+                        Expanded(
+                          child: visibleParcels.isEmpty
+                              ? Center(
+                                  child: Text(
+                                    'No data found!',
+                                    style: kTextStyle.copyWith(
+                                      color: kGreyTextColor,
+                                      fontSize: 13.sp,
+                                    ),
+                                  ),
+                                )
+                              : ListView.builder(
+                                  padding: EdgeInsets.fromLTRB(
+                                    12.w,
+                                    0,
+                                    12.w,
+                                    16.h,
+                                  ),
+                                  itemCount: visibleParcels.length,
+                                  itemBuilder: (_, index) {
+                                    return _buildParcelCard(
+                                      visibleParcels[index],
+                                    );
+                                  },
+                                ),
+                        ),
+                      ],
                     ),
-                  ),
-                ],
-              )
-
-            // Column(
-              //   children: [
-              // SizedBox(
-              // height: MediaQuery.of(context).size.height * heightValue,
-              // child: SingleChildScrollView(
-              //           child: parcel.loader
-              //               ? ParcelShimmer()
-              //               : Padding(
-              //                   padding:  EdgeInsets.all(0.r),
-              //                   child: SingleChildScrollView(
-              //                       child:
-              //                       ListView.builder(
-              //                           // primary: false,
-              //                           shrinkWrap: true,
-              //                           physics: const NeverScrollableScrollPhysics(),
-              //                           itemCount: parcel.parcelList.length,
-              //                           itemBuilder: (BuildContext context, index) {
-              //                             return
-              //                               Padding(
-              //                               padding: EdgeInsets.all(5.r),
-              //                               child:InkWell(
-              //                                 onTap: () => ParcelDetails(parcel:parcel.parcelList[index],id:parcel.parcelList[index].id).launch(context),
-              //                                 child: Container(
-              //                                   decoration: BoxDecoration(
-              //                                       borderRadius: BorderRadius.circular(16.r),
-              //                                       color: Colors.white,
-              //                                       border: Border.all(color: itembg)),
-              //                                   child: Padding(
-              //                                     padding: EdgeInsets.all(8.r),
-              //                                     child:
-              //                                     Row(
-              //                                         mainAxisAlignment: MainAxisAlignment.start,
-              //                                         children: [
-              //                                           SizedBox(
-              //                                             width: 4.w,
-              //                                           ),
-              //                                           SizedBox(
-              //                                             width: 300.w,
-              //                                             child: Column(
-              //                                               crossAxisAlignment: CrossAxisAlignment.start,
-              //                                               children: [
-              //                                                 Padding(
-              //                                                   padding:
-              //                                                   EdgeInsets.only(top: 6.h, bottom: 10.h),
-              //                                                   child: Row(
-              //                                                     children: [
-              //                                                       Text(
-              //                                                         "trackingId".tr,
-              //                                                          style:  TextStyle(
-              //                                                       fontSize: 13.sp,
-              //                                                       fontWeight: FontWeight.w500),
-              //                                                       ),
-              //                                                       Text(
-              //                                                         "#${parcel.parcelList[index].trackingId.toString()}",
-              //                                                         maxLines: 1,
-              //                                                         overflow: TextOverflow.ellipsis,
-              //                                                       ),
-              //                                                       const Spacer(),
-              //                                                       Container(
-              //                                                         padding: EdgeInsets.all(4.r),
-              //                                                         decoration: BoxDecoration(
-              //                                                           borderRadius: BorderRadius.all(
-              //                                                               Radius.circular(10.r)),
-              //                                                           color: deleveryColor,
-              //                                                         ),
-              //                                                         alignment: Alignment.center,
-              //                                                         child: SizedBox(
-              //                                                           width: 70,
-              //                                                           child: Text(
-              //                                                             parcel.parcelList[index].statusName.toString(),
-              //                                                             maxLines: 2,
-              //                                                             style: TextStyle(fontSize: 8.sp),
-              //                                                             textAlign: TextAlign.center,
-              //                                                           ),
-              //                                                         ),
-              //                                                       ),
-              //                                                     ],
-              //                                                   ),
-              //                                                 ),
-              //                                                 Text(
-              //                                                     parcel.parcelList[index].customerName.toString(),
-              //                                                   style: TextStyle(
-              //                                                       fontSize: 12.sp,
-              //                                                       fontWeight: FontWeight.w400,
-              //                                                       color: Colors.grey),
-              //                                                 ),
-              //                                                 const SizedBox(
-              //                                                   height: 2,
-              //                                                 ),
-              //                                                 Text(
-              //                                                   parcel.parcelList[index].customerPhone.toString(),
-              //                                                   style: TextStyle(
-              //                                                       fontSize: 12.sp,
-              //                                                       fontWeight: FontWeight.w400,
-              //                                                       color: Colors.grey),
-              //                                                 ),
-              //                                                 SizedBox(
-              //                                                   height: 8.h,
-              //                                                 ),
-              //                                                 Text(
-              //                                                   parcel.parcelList[index].customerAddress.toString(),
-              //                                                   style: TextStyle(
-              //                                                       fontSize: 12.sp,
-              //                                                       fontWeight: FontWeight.w400,
-              //                                                       color: Colors.grey),
-              //                                                 ),
-              //                                                 SizedBox(
-              //                                                   height: 8.h,
-              //                                                 ),
-              //                                                 Row(
-              //                                                   mainAxisAlignment: MainAxisAlignment.center,
-              //                                                   children: [
-              //                                                     Text(
-              //                                                       "total".tr,
-              //                                                       style: const TextStyle(
-              //                                                           fontSize: 14,
-              //                                                           fontWeight: FontWeight.w500),
-              //                                                     ),
-              //                                                     Text(
-              //                                                       " ${Get.find<GlobalController>()
-              //                                                           .currency!}${parcel.parcelList[index].cashCollection.toString()}",
-              //                                                     ),
-              //                                                     const Spacer(),
-              //                                                     Text(
-              //                                                       "SEE_PARCEL_DETAILS".tr,
-              //                                                       style: TextStyle(color: kMainColor),
-              //                                                     ),
-              //                                                     SizedBox(
-              //                                                       width: 2.w,
-              //                                                     ),
-              //                                                     const Icon(
-              //                                                       IconData(0xe09c, fontFamily: 'MaterialIcons', matchTextDirection: true),
-              //                                                       color: kMainColor,
-              //                                                       size: 16.0,
-              //                                                     ),
-              //                                                   ],
-              //                                                 ),
-              //                                               ],
-              //                                             ),
-              //                                           )
-              //                                         ]),
-              //                                   ),
-              //                                 ),
-              //                               ),
-              //                             );
-              //                           }),
-              //                   )))
-              // )
-              //
-              //   ],
-              // )
-          )
+            );
+          },
+        ),
       ),
     );
   }

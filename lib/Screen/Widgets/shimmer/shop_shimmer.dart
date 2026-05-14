@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:get/get.dart';
-import 'package:nb_utils/nb_utils.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../constant.dart';
 import 'package:shimmer/shimmer.dart';
 
 class ShopShimmer extends StatefulWidget {
+  const ShopShimmer({super.key});
+
   @override
   State<StatefulWidget> createState() {
     return _ShopShimmerState();
@@ -13,141 +13,122 @@ class ShopShimmer extends StatefulWidget {
 }
 
 class _ShopShimmerState extends State<ShopShimmer> {
-  var mainHeight, mainWidth;
-
   @override
   Widget build(BuildContext context) {
-    mainHeight = MediaQuery.of(context).size.height;
-    mainWidth = MediaQuery.of(context).size.width;
-
-    return  ListView.builder(
-      itemCount: 10,
-      itemBuilder: (_, i) {
-        return
-          Padding(
-            padding: const EdgeInsets.only(top: 10.0),
-            child: Column(
-              children: [
-                Shimmer.fromColors(
-                    highlightColor: Colors.grey[400]!,
-                    baseColor: Colors.grey[300]!,
-                    child:
-                    Card(
-                      color: kBgColor,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10.0),
-                      ),
-                      child: Padding(
-                        padding: const EdgeInsets.all(10.0),
-                        child: Column(
-                          crossAxisAlignment:
-                          CrossAxisAlignment.start,
-                          children: [
-                            Material(
-                              shape: RoundedRectangleBorder(
-                                borderRadius:
-                                BorderRadius.circular(5.0),
-                              ),
-                              elevation: 0.5,
-                              child: Container(
-                                width: MediaQuery.of(context).size.width,
-                                decoration: BoxDecoration(
-                                  borderRadius:
-                                  BorderRadius.circular(5.0),
-                                  color: Colors.white,
-                                ),
-                                child: Column(
-                                  crossAxisAlignment:
-                                  CrossAxisAlignment.start,
-                                  children: [
-                                    Padding(
-                                      padding:
-                                      const EdgeInsets.all(10.0),
-                                      child:
-                                      Row(
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          Text(
-                                            '' ,
-                                            style: kTextStyle.copyWith(color: kTitleColor),
-                                          ),
-                                          const Spacer(),
-                                          const Icon(FontAwesomeIcons.penToSquare,
-                                              color: kTitleColor, size: 16.0).onTap(()=> print('')),
-                                          const SizedBox(width: 20.0),
-                                          const Icon(FontAwesomeIcons.trash,
-                                              color: kTitleColor, size: 16.0)
-                                              .onTap(
-                                                () => print(''),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                            const SizedBox(height: 10.0),
-                            Row(
-                              children: [
-                                Text(
-                                  'name'.tr+':',
-                                  style: kTextStyle.copyWith(
-                                      color: kTitleColor,
-                                      fontWeight: FontWeight.bold),
-                                ),
-                                const Spacer(),
-                                Text(
-                                  '',
-                                  style: kTextStyle.copyWith(
-                                      color: kGreyTextColor),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 5.0),
-                            Row(
-                              children: [
-                                Text(
-                                  'contact'.tr+':',
-                                  style: kTextStyle.copyWith(
-                                      color: kTitleColor,
-                                      fontWeight: FontWeight.bold),
-                                ),
-                                const Spacer(),
-                                Text(
-                                  '',
-                                  style: kTextStyle.copyWith(
-                                      color: kGreyTextColor),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 5.0),
-                            Row(
-                              children: [
-                                Text(
-                                  'address'.tr+':',
-                                  style: kTextStyle.copyWith(
-                                      color: kTitleColor,
-                                      fontWeight: FontWeight.bold),
-                                ),
-                                const Spacer(),
-                                Text(
-                                  '',
-                                  style: kTextStyle.copyWith(
-                                      color: kGreyTextColor),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 5.0),
-                          ],
+    return ListView.builder(
+      padding: EdgeInsets.fromLTRB(16.w, 16.h, 16.w, 96.h),
+      itemCount: 4,
+      itemBuilder: (_, index) {
+        return Shimmer.fromColors(
+          highlightColor: Colors.grey[400]!,
+          baseColor: Colors.grey[300]!,
+          child: index == 0
+              ? Padding(
+                  padding: EdgeInsets.only(bottom: 12.h),
+                  child: Row(
+                    children: [
+                      Expanded(child: _buildSummaryPlaceholder()),
+                      SizedBox(width: 12.w),
+                      Expanded(child: _buildSummaryPlaceholder()),
+                    ],
+                  ),
+                )
+              : Container(
+                  margin: EdgeInsets.only(bottom: 12.h),
+                  padding: EdgeInsets.all(14.w),
+                  decoration: BoxDecoration(
+                    color: kBgColor,
+                    borderRadius: BorderRadius.circular(14.r),
+                    border: Border.all(color: kAccentLine),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Container(
+                        height: 18.h,
+                        width: 160.w,
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(6.r),
                         ),
                       ),
-                    )),
-              ],
-            ),
-          );
+                      SizedBox(height: 10.h),
+                      Container(
+                        height: 22.h,
+                        width: 72.w,
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(20.r),
+                        ),
+                      ),
+                      SizedBox(height: 12.h),
+                      _buildDetailPlaceholder(),
+                      SizedBox(height: 8.h),
+                      _buildDetailPlaceholder(),
+                      SizedBox(height: 14.h),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Container(
+                              height: 40.h,
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(10.r),
+                              ),
+                            ),
+                          ),
+                          SizedBox(width: 10.w),
+                          Expanded(
+                            child: Container(
+                              height: 40.h,
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(10.r),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+        );
       },
     );
+  }
 
+  Widget _buildSummaryPlaceholder() {
+    return Container(
+      height: 72.h,
+      decoration: BoxDecoration(
+        color: kAccentLight,
+        borderRadius: BorderRadius.circular(14.r),
+        border: Border.all(color: kAccentLine),
+      ),
+    );
+  }
+
+  Widget _buildDetailPlaceholder() {
+    return Row(
+      children: [
+        Container(
+          height: 14.h,
+          width: 64.w,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(4.r),
+          ),
+        ),
+        const Spacer(),
+        Container(
+          height: 14.h,
+          width: 120.w,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(4.r),
+          ),
+        ),
+      ],
+    );
   }
 }

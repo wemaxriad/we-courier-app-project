@@ -2,7 +2,8 @@ import '/Screen/Widgets/button_global.dart';
 import '/Screen/Widgets/constant.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_feather_icons/flutter_feather_icons.dart';
-import 'package:nb_utils/nb_utils.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:nb_utils/nb_utils.dart' hide redColor;
 import 'package:get/get.dart';
 
 import '../../Controllers/shop_controller.dart';
@@ -20,28 +21,189 @@ class _CreateShopsState extends State<CreateShops> {
   ShopController shopController = ShopController();
   final _formKey = GlobalKey<FormState>();
   String status = 'active'.tr;
-  List<String> selectStatus = [
+  final List<String> selectStatus = [
     'active'.tr,
     'inactive'.tr,
   ];
 
-  DropdownButton<String> selectStatusDrop() {
-    List<DropdownMenuItem<String>> dropDownItems = [];
-    for (String des in selectStatus) {
-      var item = DropdownMenuItem(
-        value: des,
-        child: Text(des),
-      );
-      dropDownItems.add(item);
-    }
-    return DropdownButton(
-      items: dropDownItems,
-      value: status,
-      onChanged: (value) {
-        setState(() {
-          status = value!;
-        });
-      },
+  static const double _formHorizontalPadding = 20;
+  static const double _fieldSpacing = 12;
+  static const double _fieldRadius = 10;
+
+  InputDecoration _fieldDecoration({
+    required String label,
+    String? hint,
+    EdgeInsetsGeometry? contentPadding,
+  }) {
+  final borderRadius = BorderRadius.circular(_fieldRadius.r);
+    return kInputDecoration.copyWith(
+      filled: true,
+      fillColor: Colors.white,
+      isDense: true,
+      labelText: label,
+      hintText: hint,
+      labelStyle: kTextStyle.copyWith(
+        color: kTitleColor,
+        fontSize: 12.sp,
+      ),
+      hintStyle: kTextStyle.copyWith(
+        color: kGreyTextColor,
+        fontSize: 12.sp,
+      ),
+      contentPadding: contentPadding ??
+          EdgeInsets.symmetric(
+            horizontal: 12.w,
+            vertical: 10.h,
+          ),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: borderRadius,
+        borderSide: const BorderSide(color: kAccentLine),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: borderRadius,
+        borderSide: const BorderSide(color: kMainColor, width: 1.5),
+      ),
+      focusedErrorBorder: OutlineInputBorder(
+        borderRadius: borderRadius,
+        borderSide: BorderSide(color: redColor),
+      ),
+      errorBorder: OutlineInputBorder(
+        borderRadius: borderRadius,
+        borderSide: BorderSide(color: redColor),
+      ),
+    );
+  }
+
+  Widget _buildStatusChips() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          '${'status'.tr}*',
+          style: kTextStyle.copyWith(
+            color: kTitleColor,
+            fontSize: 13.sp,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        SizedBox(height: 8.h),
+        Wrap(
+          spacing: 8.w,
+          runSpacing: 8.h,
+          children: selectStatus.map((value) {
+            final isActiveStatus = value == 'active'.tr;
+            final isSelected = status == value;
+
+            return Material(
+              color: Colors.transparent,
+              child: InkWell(
+                onTap: () => setState(() => status = value),
+                borderRadius: BorderRadius.circular(20.r),
+                child: Ink(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: 14.w,
+                    vertical: 8.h,
+                  ),
+                  decoration: BoxDecoration(
+                    color: isSelected
+                        ? (isActiveStatus
+                            ? green.withOpacity(0.12)
+                            : kGreyTextColor.withOpacity(0.12))
+                        : Colors.white,
+                    borderRadius: BorderRadius.circular(20.r),
+                    border: Border.all(
+                      color: isSelected
+                          ? (isActiveStatus ? green : kGreyTextColor)
+                          : kAccentLine,
+                    ),
+                  ),
+                  child: Text(
+                    value,
+                    style: kTextStyle.copyWith(
+                      color: isSelected
+                          ? (isActiveStatus ? green : kGreyTextColor)
+                          : kTitleColor,
+                      fontSize: 12.sp,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              ),
+            );
+          }).toList(),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildFormFields(ShopController shop) {
+    return Form(
+      key: _formKey,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          AppTextField(
+            showCursor: true,
+            controller: shop.nameController,
+            validator: (value) {
+              if (shop.nameController.text.isEmpty) {
+                return "this_field_can_t_be_empty".tr;
+              }
+              return null;
+            },
+            cursorColor: kTitleColor,
+            textFieldType: TextFieldType.NAME,
+            decoration: _fieldDecoration(
+              label: '${'name'.tr}*',
+              hint: 'enter_name'.tr,
+            ),
+          ),
+          SizedBox(height: _fieldSpacing.h),
+          AppTextField(
+            showCursor: true,
+            controller: shop.phoneController,
+            validator: (value) {
+              if (shop.phoneController.text.isEmpty) {
+                return "this_field_can_t_be_empty".tr;
+              }
+              return null;
+            },
+            cursorColor: kTitleColor,
+            textFieldType: TextFieldType.PHONE,
+            decoration: _fieldDecoration(
+              label: '${'mobile'.tr}*',
+              hint: 'enter_phone_number'.tr,
+            ),
+          ),
+          SizedBox(height: _fieldSpacing.h),
+          TextFormField(
+            controller: shop.addressController,
+            validator: (value) {
+              if (shop.addressController.text.isEmpty) {
+                return "this_field_can_t_be_empty";
+              }
+              return null;
+            },
+            cursorColor: kTitleColor,
+            minLines: 2,
+            maxLines: 3,
+            style: kTextStyle.copyWith(
+              color: kTitleColor,
+              fontSize: 14.sp,
+            ),
+            textAlign: TextAlign.start,
+            decoration: _fieldDecoration(
+              label: '${'address'.tr}*',
+              contentPadding: EdgeInsets.symmetric(
+                horizontal: 12.w,
+                vertical: 10.h,
+              ),
+            ),
+          ),
+          SizedBox(height: _fieldSpacing.h),
+          _buildStatusChips(),
+        ],
+      ),
     );
   }
 
@@ -59,149 +221,78 @@ class _CreateShopsState extends State<CreateShops> {
         ),
         actions: [
           Padding(
-            padding: const EdgeInsets.only(right: 10.0),
-            child: const Icon(FeatherIcons.x,color: kBgColor,).onTap(()=>finish(context))
+            padding: EdgeInsets.only(right: 10.w),
+            child: Icon(
+              FeatherIcons.x,
+              color: kBgColor,
+            ).onTap(() => finish(context)),
           ),
         ],
         backgroundColor: kMainColor,
         elevation: 0.0,
         iconTheme: const IconThemeData(color: kBgColor),
       ),
-      body:
-      GetBuilder<ShopController>(
-    init: ShopController(),
-    builder: (shop) =>
-        Stack(children: [
-        Center(
-        child:
-      SingleChildScrollView(
-        child: Column(
+      body: GetBuilder<ShopController>(
+        init: ShopController(),
+        builder: (shop) => Stack(
           children: [
-            const SizedBox(height: 30.0),
-            Container(
-              height: MediaQuery.of(context).size.height,
-              padding: const EdgeInsets.all(10.0),
-              width: MediaQuery.of(context).size.width,
-              decoration: BoxDecoration(
-                border: Border.all(color: kGreyTextColor.withOpacity(0.2)),
-                borderRadius: const BorderRadius.only(
-                  topLeft: Radius.circular(30.0),
-                  topRight: Radius.circular(30.0),
+            Column(
+              children: [
+                Expanded(
+                  child: Container(
+                    width: double.infinity,
+                    decoration: const BoxDecoration(
+                      borderRadius: BorderRadius.only(
+                        topLeft: Radius.circular(28.0),
+                        topRight: Radius.circular(28.0),
+                      ),
+                      color: kBgColor,
+                    ),
+                    child: SingleChildScrollView(
+                      padding: EdgeInsets.fromLTRB(
+                        _formHorizontalPadding.w,
+                        14.h,
+                        _formHorizontalPadding.w,
+                        14.h,
+                      ),
+                      child: _buildFormFields(shop),
+                    ),
+                  ),
                 ),
-                color: Colors.white,
-              ),
-              child: Padding(
-                padding: const EdgeInsets.all(10.0),
-                child:
-                Form(
-                  key: _formKey,
-                  child:
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const SizedBox(height: 20.0),
-                    AppTextField(
-                      showCursor: true,
-                      controller: shop.nameController,
-                      validator: (value) {
-                        if (shop.nameController.text.isEmpty) {
-                          return "this_field_can_t_be_empty".tr;
+                Container(
+                  width: double.infinity,
+                  color: kBgColor,
+                  padding: EdgeInsets.fromLTRB(
+                    _formHorizontalPadding.w,
+                    0,
+                    _formHorizontalPadding.w,
+                    14.h,
+                  ),
+                  child: SafeArea(
+                    top: false,
+                    child: ButtonGlobal(
+                      buttontext: 'submit'.tr,
+                      buttonDecoration: kButtonDecoration,
+                      onPressed: () {
+                        if (_formKey.currentState!.validate()) {
+                          shop.shopPost(status);
                         }
-                        return null;
                       },
-                      cursorColor: kTitleColor,
-                      textFieldType: TextFieldType.NAME,
-                      decoration: kInputDecoration.copyWith(
-                        labelText: 'name'.tr+'*',
-                        labelStyle: kTextStyle.copyWith(color: kTitleColor),
-                        hintText: 'enter_name'.tr,
-                        hintStyle: kTextStyle.copyWith(color: kGreyTextColor),
-                      ),
                     ),
-                    const SizedBox(height: 20.0),
-                    AppTextField(
-                      showCursor: true,
-                      controller: shop.phoneController,
-                      validator: (value) {
-                        if (shop.phoneController.text.isEmpty) {
-                          return "this_field_can_t_be_empty".tr;
-                        }
-                        return null;
-                      },
-                      cursorColor: kTitleColor,
-                      textFieldType: TextFieldType.PHONE,
-                      decoration: kInputDecoration.copyWith(
-                        labelText: 'mobile'.tr+'*',
-                        labelStyle: kTextStyle.copyWith(color: kTitleColor),
-                        hintText: 'enter_phone_number'.tr,
-                        hintStyle: kTextStyle.copyWith(color: kGreyTextColor),
-                      ),
-                    ),
-                    const SizedBox(height: 20.0),
-                    TextFormField(
-                      controller: shop.addressController,
-                      validator: (value) {
-                        if (shop.addressController.text.isEmpty) {
-                          return "this_field_can_t_be_empty";
-                        }
-                        return null;
-                      },
-                      cursorColor: kTitleColor,
-                      textAlign: TextAlign.start,
-                      decoration: kInputDecoration.copyWith(
-                        labelText: 'address'.tr+'*',
-                        labelStyle: kTextStyle.copyWith(color: kTitleColor),
-                        contentPadding: const EdgeInsets.symmetric(
-                            vertical: 40, horizontal: 10.0),
-                      ),
-                    ),
-                    const SizedBox(height: 20),
-                    SizedBox(
-                      height: 60.0,
-                      child: FormField(
-                        builder: (FormFieldState<dynamic> field) {
-                          return InputDecorator(
-                            decoration: kInputDecoration.copyWith(
-                              floatingLabelBehavior:
-                              FloatingLabelBehavior.always,
-                              labelText: 'status'.tr+'*',
-                              hintText: 'select_status'.tr,
-                              labelStyle:
-                              kTextStyle.copyWith(color: kTitleColor),
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(5.0),
-                              ),
-                            ),
-                            child: DropdownButtonHideUnderline(
-                              child: selectStatusDrop(),
-                            ),
-                          );
-                        },
-                      ),
-                    ),
-                    const SizedBox(height: 30.0),
-                   ButtonGlobal(buttontext: 'submit'.tr, buttonDecoration: kButtonDecoration, onPressed: () {
-                     if (_formKey.currentState!.validate()) {
-                       shop.shopPost(status);
-                     }
-                   })
-                  ],
-                )),
-              ),
+                  ),
+                ),
+              ],
             ),
+            if (shop.loader)
+              Positioned.fill(
+                child: Container(
+                  color: Colors.white60,
+                  child: const Center(child: LoaderCircle()),
+                ),
+              ),
           ],
         ),
-      )),
-    shop.loader
-    ? Positioned(
-    child: Container(
-    height: MediaQuery.of(context).size.height,
-    width: MediaQuery.of(context).size.width,
-    color: Colors.white60,
-    child: const Center(child: LoaderCircle())),
-    )
-        : const SizedBox.shrink(),
-    ])
-    ));
+      ),
+    );
   }
 }
