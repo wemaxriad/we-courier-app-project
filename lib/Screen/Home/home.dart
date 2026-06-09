@@ -32,7 +32,12 @@ class _HomeState extends State<Home> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: kBgColor,
-      body: _widgetOptions.elementAt(_currentPage),
+      // IndexedStack keeps tabs mounted so dashboard chart animation
+      // is not disposed mid-flight when switching bottom nav.
+      body: IndexedStack(
+        index: _currentPage,
+        children: _widgetOptions,
+      ),
       bottomNavigationBar: Container(
           clipBehavior: Clip.antiAlias,
           decoration: const BoxDecoration(

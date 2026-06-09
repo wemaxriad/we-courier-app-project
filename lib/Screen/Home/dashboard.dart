@@ -112,76 +112,83 @@ class _DashBoardState extends State<DashBoard> {
       body: GetBuilder<DashboardController>(
         builder: (dashboard) => dashboard.dashboardLoader
             ? DashboardShimmer()
-            : SingleChildScrollView(
-                padding: EdgeInsets.fromLTRB(16.w, 12.h, 16.w, 24.h),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    if (dashboard.offersList.isNotEmpty) ...[
-                      _buildOfferCarousel(dashboard),
-                      SizedBox(height: 8.h),
-                      _carouselDots(dashboard),
-                      SizedBox(height: 16.h),
-                    ],
-                    _PayoutSummaryCard(d: dashboard.dashboardData),
-                    SizedBox(height: 20.h),
-                    Text(
-                      'quick_actions'.tr,
-                      style: TextStyle(
-                        color: kTitleColor,
-                        fontWeight: FontWeight.w800,
-                        fontSize: 16.sp,
+            : RefreshIndicator(
+                color: kMainColor,
+                backgroundColor: Colors.white,
+                displacement: 48,
+                onRefresh: () => dashboard.refreshDashboard(),
+                child: SingleChildScrollView(
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  padding: EdgeInsets.fromLTRB(16.w, 12.h, 16.w, 24.h),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      if (dashboard.offersList.isNotEmpty) ...[
+                        _buildOfferCarousel(dashboard),
+                        SizedBox(height: 8.h),
+                        _carouselDots(dashboard),
+                        SizedBox(height: 16.h),
+                      ],
+                      _PayoutSummaryCard(d: dashboard.dashboardData),
+                      SizedBox(height: 20.h),
+                      Text(
+                        'quick_actions'.tr,
+                        style: TextStyle(
+                          color: kTitleColor,
+                          fontWeight: FontWeight.w800,
+                          fontSize: 16.sp,
+                        ),
                       ),
-                    ),
-                    SizedBox(height: 12.h),
-                    _quickActionsGrid(),
-                    SizedBox(height: 20.h),
+                      SizedBox(height: 12.h),
+                      _quickActionsGrid(),
+                      SizedBox(height: 20.h),
 
-                    Text(
-                      'merchant_dashboard'.tr,
-                      style: TextStyle(
-                        color: kTitleColor,
-                        fontWeight: FontWeight.w800,
-                        fontSize: 16.sp,
+                      Text(
+                        'merchant_dashboard'.tr,
+                        style: TextStyle(
+                          color: kTitleColor,
+                          fontWeight: FontWeight.w800,
+                          fontSize: 16.sp,
+                        ),
                       ),
-                    ),
-                    SizedBox(height: 12.h),
-                    _parcelMetricsGrid(dashboard),
-                    SizedBox(height: 16.h),
-                    DashboardChartsSection(
-                      cod: dashboard.dashboardData.tCodAmount ?? 0,
-                      deliveryCharge: dashboard.dashboardData.tDeliveryCharge ?? 0,
-                      packing: dashboard.dashboardData.tPackaging ?? 0,
-                      liquidFragile: dashboard.dashboardData.tLiquidFragile ?? 0,
-                    ),
-                    SizedBox(height: 16.h),
-                    _financialSixGrid(dashboard),
-                    SizedBox(height: 12.h),
-                    _cashPaymentGrid(dashboard),
-                    SizedBox(height: 12.h),
-                    _wideStat(
-                      FontAwesomeIcons.boxesStacked,
-                      'total_parcel_bank_item'.tr,
-                      dashboard.dashboardData.tParcelBank.toString(),
-                    ),
-                    SizedBox(height: 8.h),
-                    _wideStat(
-                      FontAwesomeIcons.userSlash,
-                      'total_fraud_customer'.tr,
-                      dashboard.dashboardData.tFraud.toString(),
-                    ),
-                    SizedBox(height: 20.h),
-                    // Text(
-                    //   'quick_actions'.tr,
-                    //   style: TextStyle(
-                    //     color: kTitleColor,
-                    //     fontWeight: FontWeight.w800,
-                    //     fontSize: 16.sp,
-                    //   ),
-                    // ),
-                    // SizedBox(height: 12.h),
-                    // _quickActionsGrid(),
-                  ],
+                      SizedBox(height: 12.h),
+                      _parcelMetricsGrid(dashboard),
+                      SizedBox(height: 16.h),
+                      DashboardChartsSection(
+                        cod: dashboard.dashboardData.tCodAmount ?? 0,
+                        deliveryCharge: dashboard.dashboardData.tDeliveryCharge ?? 0,
+                        packing: dashboard.dashboardData.tPackaging ?? 0,
+                        liquidFragile: dashboard.dashboardData.tLiquidFragile ?? 0,
+                      ),
+                      SizedBox(height: 16.h),
+                      _financialSixGrid(dashboard),
+                      SizedBox(height: 12.h),
+                      _cashPaymentGrid(dashboard),
+                      SizedBox(height: 12.h),
+                      _wideStat(
+                        FontAwesomeIcons.boxesStacked,
+                        'total_parcel_bank_item'.tr,
+                        dashboard.dashboardData.tParcelBank.toString(),
+                      ),
+                      SizedBox(height: 8.h),
+                      _wideStat(
+                        FontAwesomeIcons.userSlash,
+                        'total_fraud_customer'.tr,
+                        dashboard.dashboardData.tFraud.toString(),
+                      ),
+                      SizedBox(height: 20.h),
+                      // Text(
+                      //   'quick_actions'.tr,
+                      //   style: TextStyle(
+                      //     color: kTitleColor,
+                      //     fontWeight: FontWeight.w800,
+                      //     fontSize: 16.sp,
+                      //   ),
+                      // ),
+                      // SizedBox(height: 12.h),
+                      // _quickActionsGrid(),
+                    ],
+                  ),
                 ),
               ),
       ),
@@ -394,14 +401,23 @@ class _DashBoardState extends State<DashBoard> {
 
   Widget _parcelMetricsGrid(DashboardController dashboard) {
     final d = dashboard.dashboardData;
-    final transit = d.tParcel! - (d.tDelivered! + d.tReturn!);
+
+    // Null‑safe ভ্যালু বের করা (ধরে নিচ্ছি সব fields num বা int)
+    final tParcel = d.tParcel ?? 0;
+    final tDelivered = d.tDelivered ?? 0;
+    final tReturn = d.tReturn ?? 0;
+    final tShop = d.tShop ?? 0;
+    final tRequest = d.tRequest ?? 0;
+
+    final transit = tParcel - (tDelivered + tReturn);
+
     final items = <_MetricSpec>[
-      _MetricSpec('total_parcel'.tr, d.tParcel.toString(), FontAwesomeIcons.boxOpen, kAccentLight, kMainColor),
-      _MetricSpec('total_delivered'.tr, d.tDelivered.toString(), FontAwesomeIcons.circleCheck, const Color(0xFFE8F8EF), green),
-      _MetricSpec('total_return'.tr, d.tReturn.toString(), FontAwesomeIcons.rotateLeft, const Color(0xFFFDEBE9), redColor),
-      _MetricSpec('total_transit'.tr, '$transit', MdiIcons.truckFast, const Color(0xFFFFF8E6), const Color(0xFFB8860B)),
-      _MetricSpec('total_shop'.tr, d.tShop.toString(), FontAwesomeIcons.store, kDashboardPurpleTint, kMainColor),
-      _MetricSpec('total_payment_request'.tr, d.tRequest.toString(), FontAwesomeIcons.fileInvoice, itembg, kMainColor),
+      _MetricSpec('total_parcel'.tr, tParcel.toString(), FontAwesomeIcons.boxOpen, kAccentLight, kMainColor),
+      _MetricSpec('total_delivered'.tr, tDelivered.toString(), FontAwesomeIcons.circleCheck, const Color(0xFFE8F8EF), green),
+      _MetricSpec('total_return'.tr, tReturn.toString(), FontAwesomeIcons.rotateLeft, const Color(0xFFFDEBE9), redColor),
+      _MetricSpec('total_transit'.tr, transit.toString(), MdiIcons.truckFast, const Color(0xFFFFF8E6), const Color(0xFFB8860B)),
+      _MetricSpec('total_shop'.tr, tShop.toString(), FontAwesomeIcons.store, kDashboardPurpleTint, kMainColor),
+      _MetricSpec('total_payment_request'.tr, tRequest.toString(), FontAwesomeIcons.fileInvoice, itembg, kMainColor),
     ];
 
     return GridView.count(
@@ -415,19 +431,51 @@ class _DashBoardState extends State<DashBoard> {
     );
   }
 
+  // Widget _parcelMetricsGrid(DashboardController dashboard) {
+  //   final d = dashboard.dashboardData;
+  //   final transit = d.tParcel! - (d.tDelivered! + d.tReturn!);
+  //   final items = <_MetricSpec>[
+  //     _MetricSpec('total_parcel'.tr, d.tParcel.toString(), FontAwesomeIcons.boxOpen, kAccentLight, kMainColor),
+  //     _MetricSpec('total_delivered'.tr, d.tDelivered.toString(), FontAwesomeIcons.circleCheck, const Color(0xFFE8F8EF), green),
+  //     _MetricSpec('total_return'.tr, d.tReturn.toString(), FontAwesomeIcons.rotateLeft, const Color(0xFFFDEBE9), redColor),
+  //     _MetricSpec('total_transit'.tr, '$transit', MdiIcons.truckFast, const Color(0xFFFFF8E6), const Color(0xFFB8860B)),
+  //     _MetricSpec('total_shop'.tr, d.tShop.toString(), FontAwesomeIcons.store, kDashboardPurpleTint, kMainColor),
+  //     _MetricSpec('total_payment_request'.tr, d.tRequest.toString(), FontAwesomeIcons.fileInvoice, itembg, kMainColor),
+  //   ];
+  //
+  //   return GridView.count(
+  //     crossAxisCount: 3,
+  //     shrinkWrap: true,
+  //     physics: const NeverScrollableScrollPhysics(),
+  //     mainAxisSpacing: 10.h,
+  //     crossAxisSpacing: 10.w,
+  //     childAspectRatio: 0.92,
+  //     children: items.map((e) => _MetricTile(spec: e)).toList(),
+  //   );
+  // }
   Widget _financialSixGrid(DashboardController dashboard) {
     final d = dashboard.dashboardData;
-    final c = Get.find<GlobalController>().currency!;
-    final netProfit =
-        (double.tryParse(d.tSale.toString()) ?? 0) - (double.tryParse(d.tDeliveryFee.toString()) ?? 0);
+    // সেফলি কারেন্সি বের করা (null থাকলে খালি স্ট্রিং অথবা ডিফল্ট)
+    final currency = Get.find<GlobalController>().currency ?? '';
+
+    // টাকার পরিমাণগুলো safely parse করা
+    final tSale = double.tryParse(d.tSale?.toString() ?? '0') ?? 0;
+    final tDeliveryFee = double.tryParse(d.tDeliveryFee?.toString() ?? '0') ?? 0;
+    final netProfit = tSale - tDeliveryFee;
+
+    // merchant null হলে ডিফল্ট মান বসানো
+    final merchant = d.merchant;
+    final currentBalance = merchant?.currentBalance ?? 0;
+    final openingBalance = merchant?.openingBalance ?? 0;
+    final vat = merchant?.vat ?? 0;
 
     final items = <_MetricSpec>[
-      _MetricSpec('total_sales_amount'.tr, '$c ${d.tSale}', FontAwesomeIcons.chartColumn, kAccentLight, kMainColor),
-      _MetricSpec('total_delivery_fees_paid'.tr, '$c ${d.tDeliveryFee}', FontAwesomeIcons.truck, deleveryColor.withOpacity(0.35), kTitleColor),
-      _MetricSpec('net_profit_amount'.tr, '$c ${netProfit.toStringAsFixed(2)}', FontAwesomeIcons.chartLine, const Color(0xFFFCE4EC), kSecondaryColor),
-      _MetricSpec('current_balance'.tr, '$c ${d.merchant!.currentBalance}', FontAwesomeIcons.wallet, const Color(0xFFE8F8EF), green),
-      _MetricSpec('opening_balance'.tr, '$c ${d.merchant!.openingBalance}', FontAwesomeIcons.buildingColumns, const Color(0xFFFFF8E6), const Color(0xFFB8860B)),
-      _MetricSpec('vat'.tr, '$c ${d.merchant!.vat}', FontAwesomeIcons.percent, itembg, kMainColor),
+      _MetricSpec('total_sales_amount'.tr, '$currency ${d.tSale ?? 0}', FontAwesomeIcons.chartColumn, kAccentLight, kMainColor),
+      _MetricSpec('total_delivery_fees_paid'.tr, '$currency ${d.tDeliveryFee ?? 0}', FontAwesomeIcons.truck, deleveryColor.withOpacity(0.35), kTitleColor),
+      _MetricSpec('net_profit_amount'.tr, '$currency ${netProfit.toStringAsFixed(2)}', FontAwesomeIcons.chartLine, const Color(0xFFFCE4EC), kSecondaryColor),
+      _MetricSpec('current_balance'.tr, '$currency $currentBalance', FontAwesomeIcons.wallet, const Color(0xFFE8F8EF), green),
+      _MetricSpec('opening_balance'.tr, '$currency $openingBalance', FontAwesomeIcons.buildingColumns, const Color(0xFFFFF8E6), const Color(0xFFB8860B)),
+      _MetricSpec('vat'.tr, '$currency $vat', FontAwesomeIcons.percent, itembg, kMainColor),
     ];
 
     return GridView.count(
@@ -440,6 +488,31 @@ class _DashBoardState extends State<DashBoard> {
       children: items.map((e) => _MetricTile(spec: e, compactValue: true)).toList(),
     );
   }
+  // Widget _financialSixGrid(DashboardController dashboard) {
+  //   final d = dashboard.dashboardData;
+  //   final c = Get.find<GlobalController>().currency!;
+  //   final netProfit =
+  //       (double.tryParse(d.tSale.toString()) ?? 0) - (double.tryParse(d.tDeliveryFee.toString()) ?? 0);
+  //
+  //   final items = <_MetricSpec>[
+  //     _MetricSpec('total_sales_amount'.tr, '$c ${d.tSale}', FontAwesomeIcons.chartColumn, kAccentLight, kMainColor),
+  //     _MetricSpec('total_delivery_fees_paid'.tr, '$c ${d.tDeliveryFee}', FontAwesomeIcons.truck, deleveryColor.withOpacity(0.35), kTitleColor),
+  //     _MetricSpec('net_profit_amount'.tr, '$c ${netProfit.toStringAsFixed(2)}', FontAwesomeIcons.chartLine, const Color(0xFFFCE4EC), kSecondaryColor),
+  //     _MetricSpec('current_balance'.tr, '$c ${d.merchant!.currentBalance}', FontAwesomeIcons.wallet, const Color(0xFFE8F8EF), green),
+  //     _MetricSpec('opening_balance'.tr, '$c ${d.merchant!.openingBalance}', FontAwesomeIcons.buildingColumns, const Color(0xFFFFF8E6), const Color(0xFFB8860B)),
+  //     _MetricSpec('vat'.tr, '$c ${d.merchant!.vat}', FontAwesomeIcons.percent, itembg, kMainColor),
+  //   ];
+  //
+  //   return GridView.count(
+  //     crossAxisCount: 3,
+  //     shrinkWrap: true,
+  //     physics: const NeverScrollableScrollPhysics(),
+  //     mainAxisSpacing: 10.h,
+  //     crossAxisSpacing: 10.w,
+  //     childAspectRatio: 0.88,
+  //     children: items.map((e) => _MetricTile(spec: e, compactValue: true)).toList(),
+  //   );
+  // }
 
   Widget _cashPaymentGrid(DashboardController dashboard) {
     final d = dashboard.dashboardData;
@@ -609,6 +682,8 @@ class _PayoutSummaryCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final c = Get.find<GlobalController>().currency!;
+    final payable = d.tCurrentPayable ?? 0;
+    final canRequestPayout = payable > 0;
     return Container(
       width: double.infinity,
       decoration: BoxDecoration(
@@ -723,30 +798,35 @@ class _PayoutSummaryCard extends StatelessWidget {
                         child: Material(
                           color: Colors.transparent,
                           child: InkWell(
-                            onTap: () {
-                              if (Get.find<BalanceController>().loader) {
-                                return;
-                              }
-                              CreatePaymentRequest(
-                                balanceDetails:
-                                    Get.find<BalanceController>().balanceDetails,
-                              ).launch(context);
-                            },
+                            onTap: !canRequestPayout ||
+                                    Get.find<BalanceController>().loader
+                                ? null
+                                : () {
+                                    CreatePaymentRequest(
+                                      balanceDetails: Get.find<BalanceController>()
+                                          .balanceDetails,
+                                    ).launch(context);
+                                  },
                             borderRadius: BorderRadius.circular(30.r),
                             child: Ink(
-                              decoration: BoxDecoration(
-                                gradient: const LinearGradient(
-                                  colors: kPrimaryGradientColors,
-                                ),
-                                borderRadius: BorderRadius.circular(30.r),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: kMainColor.withOpacity(0.18),
-                                    blurRadius: 10,
-                                    offset: const Offset(0, 4),
-                                  ),
-                                ],
-                              ),
+                              decoration: canRequestPayout
+                                  ? BoxDecoration(
+                                      gradient: const LinearGradient(
+                                        colors: kPrimaryGradientColors,
+                                      ),
+                                      borderRadius: BorderRadius.circular(30.r),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: kMainColor.withOpacity(0.18),
+                                          blurRadius: 10,
+                                          offset: const Offset(0, 4),
+                                        ),
+                                      ],
+                                    )
+                                  : BoxDecoration(
+                                      color: Colors.grey.shade400,
+                                      borderRadius: BorderRadius.circular(30.r),
+                                    ),
                               child: Padding(
                                 padding: EdgeInsets.symmetric(
                                   vertical: 10.h,
@@ -755,7 +835,9 @@ class _PayoutSummaryCard extends StatelessWidget {
                                   child: Text(
                                     'request_payout'.tr,
                                     style: TextStyle(
-                                      color: textWhiteColor,
+                                      color: canRequestPayout
+                                          ? textWhiteColor
+                                          : Colors.white.withOpacity(0.75),
                                       fontWeight: FontWeight.w700,
                                       fontSize: 10.sp,
                                     ),

@@ -26,44 +26,50 @@ class DashboardController extends GetxController {
     super.onInit();
   }
 
-  getDashboard() {
-    server.getRequest(endPoint: APIList.dashboard).then((response) {
+  void getDashboard() {
+    _loadDashboardData();
+  }
+
+  void getOfferList() {
+    _loadOffersData();
+  }
+
+  /// Pull-to-refresh: waits for dashboard + offers so the indicator dismisses correctly.
+  Future<void> refreshDashboard() async {
+    await Future.wait([
+      _loadDashboardData(),
+      _loadOffersData(),
+    ]);
+  }
+
+  Future<void> _loadDashboardData() async {
+    final response = await server.getRequest(endPoint: APIList.dashboard);
+    if (response != null && response.statusCode == 200) {
+      dashboardLoader = false;
       final jsonResponse = json.decode(response.body);
       print(jsonResponse);
-      if (response != null && response.statusCode == 200) {
-        dashboardLoader = false;
-        final jsonResponse = json.decode(response.body);
-        print(jsonResponse);
-        var dashboard = DashboardModel.fromJson(jsonResponse);
-        dashboardData = dashboard.data!;
-        Future.delayed(Duration(milliseconds: 10), () {
-          update();
-        });
-      } else {
-        dashboardLoader = false;
-        Future.delayed(Duration(milliseconds: 10), () {
-          update();
-        });
-      }
+      var dashboard = DashboardModel.fromJson(jsonResponse);
+      dashboardData = dashboard.data!;
+    } else {
+      dashboardLoader = false;
+    }
+    Future.delayed(const Duration(milliseconds: 10), () {
+      update();
     });
   }
 
-  getOfferList() {
+  Future<void> _loadOffersData() async {
     offersList = <NewsOffers>[];
-    server.getRequest(endPoint: APIList.offerList).then((response) {
-      if (response != null && response.statusCode == 200) {
-        final jsonResponse = json.decode(response.body);
-        var offers = NewsOffersModel.fromJson(jsonResponse);
-        offersList = offers.data!.newsOffers!;
-        Future.delayed(Duration(milliseconds: 10), () {
-          update();
-        });
-      } else {
-        dashboardLoader = false;
-        Future.delayed(Duration(milliseconds: 10), () {
-          update();
-        });
-      }
+    final response = await server.getRequest(endPoint: APIList.offerList);
+    if (response != null && response.statusCode == 200) {
+      final jsonResponse = json.decode(response.body);
+      var offers = NewsOffersModel.fromJson(jsonResponse);
+      offersList = offers.data!.newsOffers!;
+    } else {
+      dashboardLoader = false;
+    }
+    Future.delayed(const Duration(milliseconds: 10), () {
+      update();
     });
   }
 }
