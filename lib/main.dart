@@ -4,7 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
-import 'package:wecourier_marchant_app/services/notification_service.dart';
+import 'package:wecourier_merchant_app/services/notification_service.dart';
 
 import 'Controllers/global-controller.dart';
 import 'Locale/language.dart';
